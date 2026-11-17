@@ -1,0 +1,539 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Jarvis</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>@property --a{syntax:'<color>';inherits:true;initial-value:#566070}
+@property --b{syntax:'<color>';inherits:true;initial-value:#8a94a6}
+*{box-sizing:border-box}
+body{--bg:#131314;--s1:#1e1f20;--s2:#2a2c2f;--tx:#e6e6e8;--mut:#a0a5ab;--hi:#ffffff14;--lo:#0000004a;--sh1:#08090a;--sh2:#2e3033;--ac:linear-gradient(135deg,#4f8cf7,#9b72cb 60%,#d96570);
+--clay:6px 6px 14px var(--sh1),-4px -4px 12px var(--sh2),inset 2px 2px 4px var(--hi),inset -3px -3px 6px var(--lo);
+--clays:3px 3px 8px var(--sh1),-3px -3px 7px var(--sh2),inset 1px 1px 2px var(--hi),inset -2px -2px 4px var(--lo);
+--clayin:inset 4px 4px 9px var(--sh1),inset -3px -3px 8px var(--sh2);--line:#ffffff14;
+--a:#566070;--b:#8a94a6;--sp:1;--lv:0;margin:0;height:100vh;display:flex;flex-direction:column;color:var(--tx);font:15px/1.55 "Google Sans","Product Sans",system-ui,"Segoe UI",sans-serif;
+background:radial-gradient(900px 520px at 12% -8%,#4f8cf726,transparent 62%),radial-gradient(800px 520px at 100% 0,#9b72cb22,transparent 60%),var(--bg);overflow:hidden;transition:--a 1.2s,--b 1.2s}
+body.light{--bg:#e9edf5;--s1:#f3f6fb;--s2:#e2e7f1;--tx:#1f2328;--mut:#5a6371;--hi:#ffffffe6;--lo:#0000001c;--sh1:#bec6d6;--sh2:#ffffff;--line:#0000001a}
+body[data-s=listen]{--a:#3b82c4;--b:#8fd0f5;--sp:1.4}body[data-s=think]{--a:#7a66d6;--b:#6bb8ee;--sp:3.2}
+body[data-s=run]{--a:#2f9d68;--b:#a3ecc0;--sp:2.2}body[data-s=speak]{--a:#d08545;--b:#f6d3a2;--sp:2}body[data-s=error]{--a:#c24848;--b:#f4a3a3;--sp:2.5}
+header{height:60px;flex:none;display:flex;align-items:center;gap:10px;padding:6px 18px;overflow-x:auto;scrollbar-width:none}
+.logo{font-weight:500;font-size:21px;letter-spacing:.2px;margin-right:auto;background:var(--ac);-webkit-background-clip:text;background-clip:text;color:transparent}
+button,select,input,textarea{font:inherit;color:inherit}
+button,select{background:var(--s1);border:0;border-radius:22px;padding:8px 15px;font-size:13px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px;box-shadow:var(--clays);transition:transform .12s,box-shadow .15s,filter .15s}
+button:hover{filter:brightness(1.1)}button:active{box-shadow:var(--clayin);transform:translateY(1px)}
+.pri{background:var(--ac);color:#fff;font-weight:500;box-shadow:4px 4px 10px #0006,-2px -2px 8px #ffffff22,inset 2px 2px 4px #ffffff55,inset -3px -3px 6px #0000003d}
+.tog.on{box-shadow:var(--clayin);color:#4cc27a}body.light .tog.on{color:#188038}
+.red{background:linear-gradient(135deg,#e2574c,#c0392b);color:#fff;box-shadow:4px 4px 10px #0005,inset 2px 2px 4px #ffffff55,inset -3px -3px 6px #0000003d}
+#bStop{display:none}body.busy #bStop{display:inline-flex}
+.ic{width:16px;height:16px;flex:none}.ib{width:44px;height:44px;padding:0;border-radius:50%;justify-content:center}.ib .ic{width:19px;height:19px}
+#wrap{flex:1;display:flex;min-height:0}#col{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center}
+.orb{position:relative;width:clamp(96px,15vmin,140px);aspect-ratio:1;flex:none;margin-top:6px;transform:scale(calc(1 + var(--lv)*.32));transition:width .7s,height .7s}
+.orb i{position:absolute;inset:0;border-radius:60% 40% 55% 45%/50% 60% 40% 50%;mix-blend-mode:screen;animation:morph calc(9s/var(--sp)) ease-in-out infinite,spin calc(16s/var(--sp)) linear infinite}
+body.light .orb i{mix-blend-mode:normal;opacity:.92}
+.orb i:nth-child(1){background:radial-gradient(circle at 30% 28%,var(--b),var(--a) 72%);box-shadow:0 0 90px -10px var(--a)}
+.orb i:nth-child(2){background:radial-gradient(circle at 70% 62%,var(--a),transparent 66%);animation-duration:calc(7s/var(--sp)),calc(21s/var(--sp));animation-direction:normal,reverse}
+.orb i:nth-child(3){inset:14%;background:radial-gradient(circle at 40% 40%,var(--b),transparent 70%);animation-duration:calc(5s/var(--sp)),calc(11s/var(--sp));animation-direction:alternate,reverse;opacity:.85}
+@keyframes morph{50%{border-radius:42% 58% 46% 54%/62% 40% 60% 38%}}@keyframes spin{to{rotate:360deg}}
+#sub{min-height:30px;margin:14px 24px 4px;text-align:center;color:var(--tx);opacity:.85;font-size:17px;max-width:780px;transition:.3s}#sub.dim{opacity:.55;font-style:italic}
+#hero{display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 24px 20px;max-width:800px}
+body.empty #hero{display:flex}body.empty #chat{display:none}
+#hero h1{font-size:clamp(32px,5.6vw,54px);font-weight:500;margin:0;letter-spacing:-.8px}.grad{background:var(--ac);-webkit-background-clip:text;background-clip:text;color:transparent}
+#hero p{color:var(--mut);font-size:17px;margin:6px 0 20px;max-width:560px}#hero>button{margin-bottom:18px}
+.chips{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}.chip{padding:12px 18px;border-radius:20px;font-size:14px}
+#chat{flex:1;width:100%;max-width:780px;overflow-y:auto;padding:6px 18px;scrollbar-width:thin}
+.m{margin:12px 0;padding:11px 18px;border-radius:22px;white-space:pre-wrap;word-break:break-word;max-width:88%;animation:in .3s}@keyframes in{from{opacity:0;transform:translateY(6px)}}
+.u{background:var(--s2);margin-left:auto;box-shadow:var(--clays);border-bottom-right-radius:8px}.ai{padding-left:4px;font-size:16px;position:relative}.err{background:#4a2a2e;color:#ffc9c9;box-shadow:var(--clays)}body.light .err{background:#fbe3e3;color:#8c1d18}
+.m img{max-width:min(360px,100%);border-radius:20px;display:block;box-shadow:var(--clay)}
+.cp{background:none;box-shadow:none;padding:4px;position:absolute;top:6px;right:6px;opacity:0;border-radius:8px}.m.ai:hover .cp{opacity:.65}.cp:hover{opacity:1!important}.cp:active{box-shadow:none}
+/* rich messages */
+.m.ai.rich{white-space:normal;max-width:100%;padding-right:34px}.rich>:first-child{margin-top:0}.rich>:last-child{margin-bottom:0}.rich p{margin:.55em 0}
+.mh{margin:1em 0 .4em;line-height:1.25;font-weight:600}h1.mh,h2.mh{font-size:1.45em;background:var(--ac);-webkit-background-clip:text;background-clip:text;color:transparent}h3.mh{font-size:1.2em}h4.mh{font-size:1.05em;color:var(--mut)}
+.rich ul,.rich ol{margin:.5em 0;padding-left:1.4em}.rich li{margin:.25em 0}.rich hr{border:0;height:2px;background:var(--line);margin:1em 0}
+.rich a{color:#8ab4f8;text-decoration:none;border-bottom:1px solid #8ab4f855;word-break:break-word}.rich a:hover{border-bottom-color:currentColor}body.light .rich a{color:#1a5fd0;border-bottom-color:#1a5fd055}
+.rich code{background:#8883;padding:1px 6px;border-radius:7px;font:.88em ui-monospace,"JetBrains Mono",Consolas,monospace}
+.rich blockquote{margin:.8em 0;padding:8px 16px;border-radius:14px;background:var(--s1);box-shadow:var(--clays);border-left:4px solid #9b72cb}.rich blockquote p{margin:.2em 0}
+.tbw{overflow-x:auto;margin:.9em 0;border-radius:18px;box-shadow:var(--clay);background:var(--s1)}.rich table{border-collapse:collapse;width:100%;font-size:.94em}
+.rich th{background:linear-gradient(135deg,#4f8cf738,#9b72cb38);font-weight:600;padding:10px 14px;white-space:nowrap}.rich td{padding:9px 14px;border-top:1px solid var(--line)}.rich tbody tr:nth-child(even) td{background:#8881}
+.cbk{background:#1e1f22;color:#bcbec4;border-radius:18px;overflow:hidden;margin:.9em 0;box-shadow:var(--clay);text-align:left}
+.cbh{display:flex;justify-content:space-between;align-items:center;background:#2b2d30;color:#9da0a8;font:12px system-ui,sans-serif;padding:6px 8px 6px 14px;text-transform:lowercase}
+.cbc{background:#393b40;color:#d3d5da;padding:4px 11px;font-size:11.5px;border-radius:12px;box-shadow:none}.cbc .ic{width:12px;height:12px}
+.cbk pre{margin:0;padding:13px 16px;overflow:auto;font:13px/1.6 ui-monospace,"JetBrains Mono",Consolas,monospace;tab-size:2}.cbk code{background:none!important;padding:0!important;font:inherit!important;color:inherit}
+.tk{color:#cc7832}.ts{color:#6a8759}.tn{color:#6897bb}.tc{color:#7a7e85;font-style:italic}
+.math{font-family:"Cambria Math","STIX Two Math","Times New Roman",serif;white-space:nowrap}.math.blk{display:block;text-align:center;margin:.9em 0;font-size:1.2em;overflow-x:auto;padding:6px 0}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 3px;font-size:.95em}.fr>span:first-child{border-bottom:1px solid currentColor;padding:0 4px}.fr>span:last-child{padding:0 4px}
+.ov{border-top:1px solid currentColor;padding-top:1px;margin-left:1px}.tx{font-style:normal}.math sup,.math sub{font-size:.7em}
+/* command + output: white clay cards */
+.cmd{background:#f7f9fd;color:#1f2328;border-radius:22px;margin:12px 0;overflow:hidden;font:12.5px/1.5 ui-monospace,"JetBrains Mono",Consolas,monospace;max-width:100%;box-shadow:6px 6px 16px var(--sh1),-4px -4px 12px var(--sh2),inset 2px 2px 5px #fff,inset -3px -3px 8px #d6dce8}
+.cmd>div{padding:7px 14px;white-space:pre-wrap;word-break:break-all;max-height:240px;overflow:auto;display:block}
+.cmd>.h{display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap;background:#0000000a;color:#2b3a55;font-weight:600;padding:9px 12px 9px 14px}.ht{flex:1;min-width:0;white-space:pre-wrap;word-break:break-all}
+.ac{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}.cb{background:#fff;color:#2b3a55;padding:4px 10px;border-radius:14px;font:500 11.5px system-ui,sans-serif;box-shadow:2px 2px 6px #c5ccd9,-2px -2px 5px #fff}.cb .ic{width:12px;height:12px}
+.cmd .e{color:#c5221f}.cmd .x{color:#137333}.cmd .ic{width:13px;height:13px;vertical-align:-2px;margin-right:4px}.cb .ic{margin:0}
+.cmd button:not(.cb){background:#fff;color:#2b3a55;box-shadow:2px 2px 6px #c5ccd9,-2px -2px 6px #fff;margin:6px 0 10px 10px}.cmd button.pri{background:var(--ac);color:#fff}
+.dot span{display:inline-block;width:7px;height:7px;margin:0 2px;border-radius:50%;background:var(--mut);animation:bn 1s infinite}.dot span:nth-child(2){animation-delay:.15s}.dot span:nth-child(3){animation-delay:.3s}@keyframes bn{50%{transform:translateY(-5px);opacity:.4}}
+/* composer */
+form{width:calc(100% - 36px);max-width:744px;margin:6px 0 22px;padding:7px 9px;display:flex;gap:4px;align-items:center;background:var(--s1);border-radius:34px;box-shadow:var(--clay)}
+#in{flex:1;min-width:0;background:transparent;border:0;outline:0;padding:10px 12px;font-size:15.5px}#in::placeholder{color:var(--mut)}
+form .ib{background:transparent;box-shadow:none}form .ib:hover{background:var(--s2)}form .ib.pri{background:var(--ac);box-shadow:3px 3px 8px #0005,inset 2px 2px 4px #ffffff55,inset -2px -2px 5px #0000003d}
+#toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--s2);box-shadow:var(--clay);padding:9px 18px;border-radius:20px;opacity:0;transition:.25s;pointer-events:none;z-index:30;font-size:13px}#toast.on{opacity:1;transform:translateX(-50%)}
+/* editor */
+#ed{display:none;width:58%;flex-direction:column;background:#2b2b2b;margin:2px 14px 14px 0;border-radius:26px;overflow:hidden;box-shadow:var(--clay);color:#e6e6e6}body.ed #ed{display:flex}
+#et{display:flex;gap:6px;flex-wrap:wrap;padding:9px;background:#3c3f41;align-items:center}#et select{background:#2b2b2b;border-radius:10px;padding:5px 9px;font-size:12.5px;max-width:200px;box-shadow:none;color:#e6e6e6}#et button{background:#4a4d4f;color:#e6e6e6;padding:5px 12px;box-shadow:none}
+#edb{flex:1;display:flex;min-height:0}#mon{flex:1;min-width:0;position:relative}#pv{flex:1;border:0;border-left:1px solid #444;background:#fff;min-width:0}
+#aib{display:flex;gap:8px;align-items:center;padding:9px 12px;background:#313335;border-top:1px solid #444}#aib .ic{color:#cc7832}#ai2{flex:1;background:#2b2b2b;border:1px solid #666;border-radius:14px;padding:9px 13px;outline:0;color:#e6e6e6}#ai2:focus{border-color:#cc7832}
+#stat{font-size:12px;color:#a9b7c6;padding:5px 14px;background:#3c3f41;min-height:26px}#stat.bad{color:#f4a3a3}
+.scan{background:linear-gradient(90deg,#2ea04388,#388bfd66)!important}
+.te{position:absolute;inset:0;display:flex;font:13px/1.5 ui-monospace,Consolas,monospace;background:#2b2b2b;overflow:hidden}.te.flash{box-shadow:inset 0 0 0 2px #2ea043}
+.te pre{margin:0;padding:8px 10px;background:#313335;color:#606366;text-align:right;min-width:44px;user-select:none;overflow:hidden}.te textarea{flex:1;background:transparent;color:#a9b7c6;border:0;outline:0;resize:none;padding:8px 10px;white-space:pre;overflow:auto;tab-size:2;font:inherit}
+/* live */
+#lb{display:none;position:fixed;bottom:26px;left:0;right:0;justify-content:center;gap:14px;z-index:6}
+body.live header,body.live #chat,body.live form,body.live #ed,body.live #hero{display:none!important}body.live #lb{display:flex}
+body.live .orb{position:fixed;inset:0;margin:auto;width:min(82vw,82vh);transition:width .7s;opacity:.9}
+body.live #sub{position:fixed;left:0;right:0;bottom:14vh;max-width:none;font-size:clamp(20px,3.4vw,36px);z-index:3;text-shadow:0 0 18px #000,0 2px 6px #000;margin:0 6vw;color:#fff;opacity:1}
+body.live .ask{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);z-index:9;max-width:90vw}body.ed .orb{width:84px}
+/* settings */
+dialog{background:var(--s1);color:var(--tx);border:0;border-radius:30px;padding:0;width:min(680px,94vw);max-height:92vh;box-shadow:var(--clay),0 30px 90px #000a}dialog::backdrop{background:#000b}
+.dh{display:flex;align-items:center;gap:10px;padding:16px 22px;position:sticky;top:0;background:var(--s1);z-index:2}.dh b{font-size:18px;font-weight:500;margin-right:auto}
+#sbody{padding:4px 22px 10px;overflow:auto;max-height:calc(92vh - 140px)}.df{padding:14px 22px;text-align:right;position:sticky;bottom:0;background:var(--s1)}
+.card2{background:var(--s1);border-radius:24px;padding:16px 18px;margin:16px 0;box-shadow:var(--clay)}.ch{display:flex;align-items:center;gap:9px}.ch b{font-weight:500}.ch .ic{width:18px;height:18px;color:#8ab4f8}
+.tag{margin-left:auto;font-size:11px;padding:3px 10px;border-radius:12px;background:#8882;color:var(--mut)}.tag.req{background:#f9ab0033;color:#e0a010}.tag.free{background:#34a85326;color:#34a853}.tag.soon{background:#4285f426;color:#6b9bf5}
+.why{color:var(--mut);font-size:13px;margin:8px 0 6px}.why b{color:var(--tx);font-weight:500}.why a{color:#8ab4f8;text-decoration:none}
+.card2 label{display:block;margin:11px 0 5px;color:var(--mut);font-size:12.5px}.card2 input:not([type=checkbox]),.card2 select,.card2 textarea{width:100%;background:var(--s1);box-shadow:var(--clayin);border:0;border-radius:14px;padding:10px 13px;outline:0;color:var(--tx)}
+.card2 input[type=range]{padding:0}.card2 textarea{resize:vertical;font:12.5px ui-monospace,Consolas,monospace}.card2 input[type=checkbox]{width:18px;height:18px;vertical-align:middle;accent-color:#4f8cf7}.card2 .chk{display:inline-block;margin-left:8px;color:var(--tx);font-size:13.5px}
+.row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;align-items:center}.mem{font-size:13px;margin:8px 0}.mem div{padding:4px 0;border-bottom:1px solid var(--line)}
+@media(max-width:1000px){header .t{display:none}}@media(max-width:800px){body.ed #col{display:none}body.ed #ed{width:auto;flex:1;margin:0 10px 10px}}
+/* ===== v2 polish ===== */
+body{font-family:"Plus Jakarta Sans","Google Sans",system-ui,"Segoe UI",sans-serif;--a:#5f6a80;--b:#a3afc8;--g:linear-gradient(150deg,#2c2e33,#1b1c1f)}
+body.light{--g:linear-gradient(150deg,#ffffff,#e2e7f0);--a:#7b88a6;--b:#c3cde4}
+::selection{background:#4f8cf766}*{scrollbar-width:thin;scrollbar-color:#8885 transparent}::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:#8885;border-radius:8px}
+header{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.logo{display:flex;align-items:center;gap:10px;font-weight:600;letter-spacing:-.2px}.logo::before{content:"";width:24px;height:24px;border-radius:50%;background:var(--ac);box-shadow:inset 2px 2px 4px #fff7,inset -3px -3px 6px #0004,0 0 16px #9b72cb88;flex:none}
+button,select,.u,form,.tbw,dialog{background:var(--g)}
+button:hover{transform:translateY(-1px);filter:brightness(1.12)}button:active{transform:translateY(1px)}
+.orb::after{content:"";position:absolute;left:20%;top:12%;width:36%;height:20%;border-radius:50%;background:radial-gradient(ellipse,#ffffffb0,transparent 72%);filter:blur(3px);transform:rotate(-28deg);pointer-events:none}
+body.light .orb::after{background:radial-gradient(ellipse,#fff,transparent 72%)}
+#stl{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:500;color:var(--mut);padding:5px 13px;border-radius:14px;background:var(--g);box-shadow:var(--clays);margin-top:10px;letter-spacing:.2px}
+#stl::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--a);box-shadow:0 0 10px var(--a)}#stl::after{content:"Ready"}
+body[data-s=listen] #stl::after{content:"Listening"}body[data-s=think] #stl::after{content:"Thinking…"}body[data-s=run] #stl::after{content:"Working…"}body[data-s=speak] #stl::after{content:"Speaking"}body[data-s=error] #stl::after{content:"Something went wrong"}
+body.live #stl{position:fixed;top:24px;left:50%;transform:translateX(-50%);z-index:4;margin:0}
+body:not(.live):not(.ed).empty .orb{width:clamp(150px,27vmin,240px);margin-top:3vh}
+#hero{padding-bottom:8px}#hero h1{font-size:clamp(34px,6vw,58px);font-weight:600;letter-spacing:-1.2px}#hero p{font-size:17px;line-height:1.6}
+.chips{max-width:720px}.chip{transition:transform .15s,box-shadow .15s}.chip:hover{transform:translateY(-3px)}
+.chip:nth-child(1) .ic{color:#4f8cf7}.chip:nth-child(2) .ic{color:#9b72cb}.chip:nth-child(3) .ic{color:#f4b400}.chip:nth-child(4) .ic{color:#e0707c}.chip:nth-child(5) .ic{color:#34a853}
+.m.ai{padding-left:42px;min-height:34px}.m.ai::before{content:"";position:absolute;left:4px;top:11px;width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 30% 28%,#fff8,transparent 45%),var(--ac);box-shadow:var(--clays)}
+.m.ai.rich{padding-left:42px}.m.ai .cp{right:2px}
+.m.u{padding:11px 20px}
+form{transition:box-shadow .25s}form:focus-within{box-shadow:var(--clay),0 0 0 2px #7f8cf7aa,0 0 30px #9b72cb44}
+.cmd::before{content:"";display:block;height:3px;background:var(--ac)}.cmd{transition:transform .15s}
+.ch .ic{width:32px;height:32px;padding:7px;border-radius:50%;background:#8ab4f822;color:#8ab4f8}body.light .ch .ic{color:#1a5fd0;background:#1a5fd01a}
+.card2{transition:transform .15s}.dh b{font-weight:600}
+@media(max-width:600px){header{padding:6px 10px;gap:6px}.logo{font-size:0;gap:0;order:-2}#bLive{order:-1}#bFs,#bNew{display:none}#hero h1{font-size:30px}#hero p{font-size:15px}.chip{padding:10px 14px;font-size:13px}.m{max-width:100%}.m.ai,.m.ai.rich{padding-left:38px}form{width:calc(100% - 20px)}#chat{padding:6px 10px}body:not(.live):not(.ed).empty .orb{width:140px}.cb span{display:none}}
+/* ===== v3: dark command cards, solid chat panel, terminal, palette ===== */
+body{--panel:#16171a}body.light{--panel:#eceff6}
+.cmd{background:#17181b;color:#d4d7dc;box-shadow:var(--clay)}.cmd>.h{background:#222428;color:#b9c4d8}
+.cb{background:#2f3136;color:#d4d7dc;box-shadow:2px 2px 6px #0008,-1px -1px 4px #ffffff0d}.cmd .x{color:#6fcf97}.cmd .e{color:#f28b82}
+.cmd button:not(.cb){background:var(--g);color:var(--tx);box-shadow:var(--clays)}
+#cw{position:relative;flex:1;min-height:0;width:calc(100% - 36px);max-width:780px;display:flex;border-radius:30px;background:var(--panel);box-shadow:var(--clayin);overflow:hidden;margin:6px 0 4px}
+#cw::before,#cw::after{content:"";position:absolute;left:0;right:0;height:28px;z-index:2;pointer-events:none}
+#cw::before{top:0;background:linear-gradient(var(--panel) 15%,transparent)}#cw::after{bottom:0;background:linear-gradient(transparent,var(--panel) 85%)}
+#chat{flex:1;min-width:0;width:auto;max-width:none;padding:32px 22px}body.empty #cw{display:none}body.live #cw{display:none!important}
+#sdn{position:absolute;right:16px;bottom:20px;z-index:3;width:38px;height:38px;display:none}#sdn.on{display:inline-flex}
+.sk{display:flex;flex-direction:column;gap:8px;padding:8px 0 2px;width:min(320px,70vw)}.sk i{display:block;height:11px;border-radius:8px;background:linear-gradient(90deg,#8883 25%,#8886 50%,#8883 75%);background-size:300% 100%;animation:shim 1.4s linear infinite}.sk i:nth-child(2){width:80%}.sk i:nth-child(3){width:55%}@keyframes shim{to{background-position:-300% 0}}
+#term{display:none;flex:none;flex-direction:column;height:var(--th,34vh);min-height:120px;margin:0 14px 14px;border-radius:24px;overflow:hidden;background:#0e0f11;color:#d4d7dc;box-shadow:var(--clay)}body.tm #term{display:flex}body.live #term{display:none!important}
+#tmh{display:flex;align-items:center;gap:7px;padding:8px 10px 8px 16px;background:#1a1b1e;cursor:ns-resize;user-select:none;flex-wrap:wrap}#tmh .tt{display:flex;align-items:center;gap:8px;font-weight:600;font-size:13px;color:#b9c4d8}
+#tmh button{background:#2a2c30;color:#d4d7dc;box-shadow:none;padding:4px 10px;font-size:12px}.tspace{flex:1}
+#tms{font-size:11.5px;padding:3px 10px;border-radius:12px;color:#8a8f98;max-width:46%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#tms.ai{background:var(--ac);color:#fff}#tms.busy{background:#3a3320;color:#f3cf8a}
+#tmb{flex:1;overflow:auto;padding:10px 16px;font:13px/1.45 ui-monospace,"JetBrains Mono",Menlo,Consolas,monospace;cursor:text}#tout .tl{white-space:pre-wrap;word-break:break-all;min-height:1.45em}
+#tcur::after{content:"";display:inline-block;width:.55em;height:1.1em;background:#d4d7dc;vertical-align:text-bottom;margin-left:1px;animation:blink 1s steps(2) infinite}@keyframes blink{50%{opacity:0}}
+#tmq{display:flex;gap:6px;flex-wrap:wrap;padding:2px 14px 8px;background:#0e0f11}#tmq button{background:#1d1f23;color:#a9afb9;padding:3px 10px;font:11.5px ui-monospace,monospace;box-shadow:none}
+#tmi{display:flex;align-items:center;gap:9px;padding:9px 16px;background:#16171a;border-top:1px solid #ffffff10}#tmp{color:#6fcf97;font:600 13px ui-monospace,monospace}
+#tmin{flex:1;background:transparent;border:0;outline:0;color:#e8eaed;font:13px ui-monospace,"JetBrains Mono",Menlo,Consolas,monospace}
+#pal{display:none;position:fixed;inset:0;z-index:50;background:#0008;align-items:flex-start;justify-content:center;padding-top:14vh}#pal.on{display:flex}
+.pbox{width:min(560px,92vw);background:var(--s1);border-radius:26px;box-shadow:var(--clay),0 30px 80px #000a;overflow:hidden}
+#pin{width:100%;border:0;outline:0;background:transparent;padding:18px 22px;font-size:16px;border-bottom:1px solid var(--line)}
+#plist{max-height:50vh;overflow:auto;padding:8px}.pi{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:16px;cursor:pointer;font-size:14px}.pi.sel{background:var(--g);box-shadow:var(--clays)}.pi .ic{color:#8ab4f8}
+#hero p.hint{font-size:12.5px;color:var(--mut);margin:16px 0 0}.hint kbd{background:var(--g);box-shadow:var(--clays);border-radius:8px;padding:2px 8px;font:12px ui-monospace,monospace}
+body.rm *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+/* google */
+.steps{margin:8px 0 4px;padding-left:20px;color:var(--mut);font-size:13px}.steps li{margin:5px 0}.steps b{color:var(--tx);font-weight:500}.steps a{color:#8ab4f8;text-decoration:none}
+.gl{display:flex;flex-wrap:wrap;gap:7px;margin:8px 0 4px}.gl a{background:var(--g);box-shadow:var(--clays);border-radius:14px;padding:4px 12px;font-size:12px;color:var(--tx);text-decoration:none}.gl a:hover{filter:brightness(1.15)}
+</style></head><body data-s="idle">
+<header><span class="logo">Jarvis</span><select id="bP" title="Personality"><option value="assistant">Assistant</option><option value="agent">Agent</option><option value="coder">Code writer</option><option value="ceo">Company CEO</option><option value="pm">Project manager</option><option value="friend">Friend</option></select>
+<button id="bAuto" class="tog" data-ic="zap"><span class="t">Auto-approve</span></button><button id="bVoice" class="tog" data-ic="vol"><span class="t">Voice</span></button><button id="bNew" data-ic="plus" title="New chat"><span class="t">New chat</span></button>
+<button id="bStop" class="red" data-ic="stop"><span class="t">Stop</span></button><button id="bTheme" data-ic="sunny" title="Light / dark"></button><button id="bTerm" data-ic="term"><span class="t">Terminal</span></button><button id="bEd" data-ic="code"><span class="t">Editor</span></button><button id="bFs" data-ic="max" title="Full screen"></button><button id="bSet" data-ic="sliders"><span class="t">Settings</span></button><button id="bLive" class="pri" data-ic="phone">Live call</button></header>
+<div id="wrap"><section id="col"><div class="orb"><i></i><i></i><i></i></div><div id="stl"></div><div id="sub"></div><div id="hero"><h1>Hello, <span class="grad">I'm Jarvis</span></h1><p id="gt"></p><div class="chips" id="chips"></div><p class="hint">Press <kbd>Ctrl</kbd> + <kbd>K</kbd> for the command palette</p></div><div id="cw"><div id="chat"></div><button id="sdn" class="ib" data-ic="down" title="Jump to latest"></button></div>
+<form id="f"><button type="button" class="ib" id="mic" data-ic="mic" title="Dictate"></button><button type="button" class="ib" id="att" data-ic="clip" title="Attach files"></button><input type="file" id="fi" multiple hidden>
+<input id="in" placeholder="Ask Jarvis anything…   (start with ! to run a command yourself)" autocomplete="off" autofocus><button class="ib pri" data-ic="send" title="Send"></button></form></section>
+<section id="ed"><div id="et"><select id="fsel"></select><button id="bSave" data-ic="save">Save</button><button id="bPv" data-ic="eye">Preview</button><button id="bTab" data-ic="ext">New tab</button><button id="bRev" data-ic="undo">Revert</button><button id="bNewF" data-ic="plus">New file</button></div>
+<div id="edb"><div id="mon"></div><iframe id="pv"></iframe></div>
+<div id="aib"><span data-ic="spark"></span><input id="ai2" placeholder="Describe a change to this file…  (Ctrl+I)" autocomplete="off"><button id="bAI" class="pri">Edit with AI</button></div><div id="stat"></div></section></div>
+<section id="term"><div id="tmh"><span class="tt" data-ic="term">Terminal</span><span id="tms"></span><span class="tspace"></span><button id="tmC" data-ic="stop" title="Send Ctrl+C">Ctrl+C</button><button id="tmCl" data-ic="trash">Clear</button><button id="tmCp" data-ic="copy">Copy</button><button id="tmR" data-ic="replay">Restart</button><button id="tmX" data-ic="x" title="Close"></button></div>
+<div id="tmb"><div id="tout"></div></div><div id="tmq"></div><div id="tmi"><span id="tmp">❯</span><input id="tmin" spellcheck="false" autocomplete="off" placeholder="Type a command. This is a real shell, and Jarvis uses it too."></div></section>
+<div id="pal"><div class="pbox"><input id="pin" placeholder="Type a command…" autocomplete="off"><div id="plist"></div></div></div>
+<div id="lb"><button id="bMute" data-ic="mic">Mute</button><button id="bEnd" class="red" data-ic="phoneoff">End call</button></div>
+<dialog id="dlg"><div class="dh"><span data-ic="sliders"></span><b>Settings &amp; integrations</b><button id="dx" data-ic="x" title="Close"></button></div><div id="sbody"></div><div class="df"><button id="ok" class="pri">Save settings</button></div></dialog>
+<div id="toast"></div>
+<script>
+const $=s=>document.querySelector(s),T="__TOKEN__",F="```";
+const IC={calendar:'<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',table:'<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>',slides:'<rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8M12 17v4"/>',form:'<rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2M9 12h6M9 16h4"/>',down:'<polyline points="6 9 12 15 18 9"/>',copy:'<rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',moon:'<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',sunny:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"/>',stop:'<rect width="14" height="14" x="5" y="5" rx="2"/>',replay:'<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',mic:'<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/>',
+micx:'<line x1="2" x2="22" y1="2" y2="22"/><path d="M18.9 13.2A7 7 0 0 0 19 12v-2"/><path d="M5 10v2a7 7 0 0 0 12 5"/><path d="M15 9.3V5a3 3 0 0 0-5.7-1.3"/><path d="M9 9v3a3 3 0 0 0 5.1 2.1"/><line x1="12" x2="12" y1="19" y2="22"/>',
+send:'<path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>',clip:'<path d="m21.4 11-9.2 9.2a6 6 0 0 1-8.5-8.5l8.6-8.6A4 4 0 1 1 18 8.8l-8.6 8.6a2 2 0 0 1-2.8-2.8l8.5-8.5"/>',
+code:'<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>',max:'<path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/>',
+sliders:'<line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/>',
+phone:'<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/>',
+phoneoff:'<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/><line x1="2" x2="22" y1="2" y2="22"/>',
+vol:'<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/>',volx:'<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/>',
+zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',save:'<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>',
+eye:'<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',ext:'<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/>',
+undo:'<path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/>',spark:'<path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/>',
+file:'<path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/>',term:'<polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/>',
+pen:'<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>',check:'<polyline points="20 6 9 17 4 12"/>',x:'<line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/>',
+mail:'<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',inbox:'<polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.5 5.1 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9A2 2 0 0 0 16.8 4H7.2a2 2 0 0 0-1.7 1.1z"/>',
+search:'<circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/>',globe:'<circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
+sun:'<path d="M12 2v2"/><path d="m4.9 4.9 1.4 1.4"/><path d="M20 12h2"/><path d="m19.1 4.9-1.4 1.4"/><path d="M15.9 12.7a4 4 0 0 0-5.9-4.2"/><path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"/>',
+img:'<rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/>',cpu:'<rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9"/><path d="M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2"/>',
+trash:'<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',plus:'<line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/>',
+bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',book:'<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>',
+dl:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>',eyeb:'<circle cx="12" cy="12" r="3"/><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>',
+cloud:'<path d="M17.5 19H9a7 7 0 1 1 6.7-9h1.8a4.5 4.5 0 1 1 0 9Z"/>',db:'<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/>'};
+const I=n=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${IC[n]||""}</svg>`;
+const setIc=(el,n)=>{el.querySelector(":scope>svg")?.remove();el.insertAdjacentHTML("afterbegin",I(n))};
+document.querySelectorAll("[data-ic]").forEach(e=>setIc(e,e.dataset.ic));
+const ACC={gemini:'linear-gradient(135deg,#4f8cf7,#9b72cb 60%,#d96570)',ocean:'linear-gradient(135deg,#2dd4bf,#3b82f6 60%,#6366f1)',sunset:'linear-gradient(135deg,#f97316,#ec4899 60%,#8b5cf6)',mint:'linear-gradient(135deg,#34d399,#10b981 50%,#06b6d4)',mono:'linear-gradient(135deg,#9ca3af,#6b7280 60%,#4b5563)'},
+TZ=Intl.DateTimeFormat().resolvedOptions().timeZone,
+DOTS='<span class="sk"><i></i><i></i><i></i></span>',
+P={gemini:["","gemini-2.5-flash"],groq:["https://api.groq.com/openai/v1","llama-3.3-70b-versatile"],openrouter:["https://openrouter.ai/api/v1","openai/gpt-4o-mini"],openai:["https://api.openai.com/v1","gpt-4o-mini"],anthropic:["","claude-sonnet-5-5"],ollama:["http://localhost:11434/v1","llama3.2"],custom:["",""]},
+PERSONA={assistant:"Act as a friendly assistant: chat naturally and use actions only when asked or clearly useful.",agent:"Act as an autonomous agent: plan, then use actions to finish the task end to end.",coder:"Act as an expert code writer: build complete multi-file projects in organised folders, host and test them.",ceo:"Act as a company CEO: set strategy, delegate to yourself as a team, and ship real files and results.",pm:"Act as a project manager: break work into steps, keep plans/roadmaps as files and report progress.",friend:"Talk like a warm, witty friend; short and conversational."};
+/* ---------- integrations: every API explained ---------- */
+const CFG=[
+{ic:"cpu",name:"AI brain",tag:"Required",tg:"req",why:"This is the language model that thinks, decides what to do and writes the code. Without it Jarvis can't answer anything. Gemini and Groq have free tiers, and Ollama runs fully offline with no key at all.",link:"https://aistudio.google.com/apikey",fields:[{k:"p",l:"Provider",t:"select",o:Object.keys(P)},{k:"k",l:"API key",t:"password"},{k:"m",l:"Model"},{k:"u",l:"Base URL (OpenAI-compatible providers)"}],test:1},
+{ic:"zap",name:"Permissions: auto-approve",tag:"Optional",why:"Normally Jarvis asks before running a command or sending an email. Turn this on and he acts straight away without asking every time. Everything he runs still appears in the chat so you can see it. Leave it off if you want to review each step. (Same as the Auto-run button at the top.)",fields:[{k:"auto",l:"Auto-approve commands and emails (don't ask me each time)",t:"check"}]},
+{ic:"sliders",name:"Appearance",tag:"Optional",why:"Pick the accent colour used for the logo, buttons, headings and glow, and turn on reduced motion if the animations feel like too much. Changes apply as soon as you save.",fields:[{k:"ac",l:"Accent colour",t:"select",o:["gemini","ocean","sunset","mint","mono"]},{k:"rm",l:"Reduce motion (calmer animations)",t:"check"}]},
+{ic:"term",name:"External services & tokens (for commands)",tag:"Optional",why:"Tokens that let Jarvis use outside services from the command line: GITHUB_TOKEN (git push, create repos with gh), VERCEL_TOKEN or NETLIFY_AUTH_TOKEN (deploy a site live), CLOUDFLARE_API_TOKEN, or any other tool. They are passed only to commands he runs. He sees the names, never the values.",fields:[{k:"env",l:"One KEY=VALUE per line",t:"area",ph:"GITHUB_TOKEN=ghp_...\nVERCEL_TOKEN=..."}]},
+{ic:"vol",name:"Natural voice (ElevenLabs)",tag:"Optional",why:"Gives Jarvis a realistic, human male voice for talking and live calls. Without it he uses your browser's built-in voice, which is free but more robotic.",link:"https://elevenlabs.io/app/settings/api-keys",fields:[{k:"el",l:"ElevenLabs API key",t:"password"},{k:"elv",l:"Voice ID",ph:"default: Adam (pNInz6obpgDQGcFmaJgB)"}]},
+{ic:"vol",name:"Browser voice & speed",tag:"Optional",why:"Picks which built-in voice Jarvis uses and how fast he speaks. Only used when ElevenLabs isn't set.",fields:[{k:"vn",l:"Voice",t:"vsel"},{k:"vr",l:"Speed",t:"range"}]},
+{ic:"search",name:"Live web search (Tavily)",tag:"Optional",why:"Lets Jarvis look things up right now: news, documentation, prices, facts after his training. Without a key he falls back to DuckDuckGo, which works but can be rate-limited.",link:"https://app.tavily.com",fields:[{k:"tv",l:"Tavily API key",t:"password"}]},
+{ic:"mail",name:"Email (SMTP / IMAP)",tag:"Optional",why:"So he can read your inbox and send emails, including designed HTML emails, when you ask. Use an app password, never your main password. It stays in this browser.",link:"https://myaccount.google.com/apppasswords",fields:[{k:"ma",l:"Email address",ph:"you@gmail.com"},{k:"mp",l:"App password",t:"password"},{k:"ms",l:"SMTP host",ph:"smtp.gmail.com"},{k:"mi",l:"IMAP host",ph:"imap.gmail.com"}]},
+{ic:"send",name:"Telegram notifications",tag:"Optional",why:"Lets him message your phone when a long job finishes or a reminder fires. Create a bot with @BotFather, send it any message, then paste its token and your chat ID.",link:"https://t.me/BotFather",fields:[{k:"tgt",l:"Bot token",t:"password"},{k:"tgc",l:"Your chat ID"}]},
+{ic:"globe",name:"Weather, web pages, images, memory & reminders",tag:"No key needed",tg:"free",why:"Weather comes from Open-Meteo, page reading uses plain web requests, image generation uses Pollinations, and memory and reminders are stored on your computer. All free; nothing to set up."}];
+let S=Object.assign({ac:"gemini",p:"gemini",k:"",m:"gemini-2.5-flash",u:"",auto:true,voice:true,persona:"assistant",vr:1.03},JSON.parse(localStorage.jv||"{}")),
+H=JSON.parse(localStorage.jvh||"[]"),LOG=JSON.parse(localStorage.jvlog||"[]"),INFO={},gen=0,ctl=null,speaking=0,spoken="",live=0,muted=0,rec=null,an=null,micS=null,lv=0,curA=null,audR=null,ELFAIL=0;
+const save=()=>{localStorage.jv=JSON.stringify(S);$("#bAuto").classList.toggle("on",!!S.auto);$("#bAuto").title="Auto-approve: "+(S.auto?"ON - commands and emails run without asking":"OFF - asks before running commands and sending email");document.body.classList.toggle("light",S.theme=="light");document.body.style.setProperty("--ac",ACC[S.ac]||ACC.gemini);document.body.classList.toggle("rm",!!S.rm);setIc($("#bTheme"),S.theme=="light"?"moon":"sunny");setIc($("#bVoice"),S.voice?"vol":"volx");$("#bVoice").classList.toggle("on",!!S.voice);$("#bP").value=S.persona},
+sv=()=>{localStorage.jvh=JSON.stringify(H.slice(-40));localStorage.jvlog=JSON.stringify(LOG.slice(-60))};save();
+const st=s=>document.body.dataset.s=s,sleep=ms=>new Promise(r=>setTimeout(r,ms)),idle=()=>st(live?"listen":"idle");
+const post=(p,b)=>fetch(p,{method:"POST",headers:{"X-Token":T},body:JSON.stringify(b||{})}).then(r=>r.json()).catch(e=>({ok:false,error:"Server not reachable: "+e.message}));
+/* ---------- rich messages: markdown, tables, math, links, code ---------- */
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"),
+GREEK={alpha:"α",beta:"β",gamma:"γ",delta:"δ",epsilon:"ε",zeta:"ζ",eta:"η",theta:"θ",kappa:"κ",lambda:"λ",mu:"μ",nu:"ν",xi:"ξ",pi:"π",rho:"ρ",sigma:"σ",tau:"τ",phi:"φ",chi:"χ",psi:"ψ",omega:"ω",Gamma:"Γ",Delta:"Δ",Theta:"Θ",Lambda:"Λ",Pi:"Π",Sigma:"Σ",Phi:"Φ",Psi:"Ψ",Omega:"Ω"},
+SYM={times:"×",cdot:"·",div:"÷",pm:"±",mp:"∓",leq:"≤",le:"≤",geq:"≥",ge:"≥",neq:"≠",ne:"≠",approx:"≈",equiv:"≡",infty:"∞",to:"→",rightarrow:"→",leftarrow:"←",Rightarrow:"⇒",Leftrightarrow:"⇔",sum:"∑",prod:"∏",int:"∫",partial:"∂",nabla:"∇",in:"∈",subset:"⊂",cup:"∪",cap:"∩",forall:"∀",exists:"∃",ldots:"…",cdots:"⋯",degree:"°",angle:"∠",propto:"∝",sin:"sin",cos:"cos",tan:"tan",log:"log",ln:"ln",lim:"lim",max:"max",min:"min"};
+function texLite(s){let i=0;const conv=s=>{let o="",i=0;const grp=()=>{while(s[i]==" ")i++;if(s[i]=="{"){let d=1,j=i+1;while(j<s.length&&d){if(s[j]=="{")d++;else if(s[j]=="}")d--;j++}const r=s.slice(i+1,j-1);i=j;return conv(r)}if(s[i]=="\\"){const m=/^\\[A-Za-z]+/.exec(s.slice(i));if(m){i+=m[0].length;return conv(m[0])}}return esc(s[i++]||"")};
+ while(i<s.length){const c=s[i];if(c=="\\"){const m=/^\\([A-Za-z]+|.)/.exec(s.slice(i));const n=m[1];i+=m[0].length;
+  if(n=="frac"||n=="dfrac"){const a=grp(),b=grp();o+=`<span class="fr"><span>${a}</span><span>${b}</span></span>`}
+  else if(n=="sqrt"){o+='√<span class="ov">'+grp()+"</span>"}
+  else if(/^(text|mathrm|mathbf|mathbb|operatorname|textbf)$/.test(n))o+='<span class="tx">'+grp()+"</span>";
+  else if(GREEK[n])o+=GREEK[n];else if(SYM[n])o+=SYM[n];else if(/^(left|right|displaystyle|quad|qquad)$/.test(n))o+=n[0]=="q"?" ":"";
+  else if(n==","||n==";"||n==" "||n=="!")o+=" ";else if(n=="\\")o+="<br>";else o+=esc(n)}
+  else if(c=="^"){i++;o+="<sup>"+grp()+"</sup>"}else if(c=="_"){i++;o+="<sub>"+grp()+"</sub>"}else if(c=="{"||c=="}")i++;else{o+=esc(c);i++}}return o};return conv(s)}
+const mathEl=(t,b)=>`<span class="math${b?" blk":""}" data-b="${b?1:0}" data-tex="${esc(t).replace(/"/g,"&quot;")}">${texLite(t)}</span>`;
+function upgradeMath(root){if(!window.katex)return;root.querySelectorAll(".math:not(.kx)").forEach(e=>{try{katex.render(e.dataset.tex,e,{displayMode:e.dataset.b=="1",throwOnError:false});e.classList.add("kx")}catch(x){}})}
+function loadKatex(){const l=document.createElement("link");l.rel="stylesheet";l.href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css";document.head.append(l);const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js";s.onload=()=>upgradeMath(document);s.onerror=()=>{};document.head.append(s)}
+const KW=new Set("function const let var return if else elif for while class def import from as try except catch finally new async await in of is not and or None True False null true false undefined this self public private static void int string float bool echo do done fi then with lambda yield switch case break continue export default extends print raise pass fn pub use mut match impl struct enum interface type package func go range defer select SELECT FROM WHERE INSERT UPDATE DELETE JOIN".split(" "));
+function hl(code,lang){const slash=/^(js|javascript|ts|typescript|java|c|cpp|c\+\+|cs|csharp|go|rust|rs|php|swift|kotlin|jsx|tsx|css|scss|sql)$/.test(lang),hash=/^(py|python|sh|bash|zsh|shell|yaml|yml|rb|ruby|toml|powershell|ps1|bat|r|dockerfile|makefile)$/.test(lang);
+ if(!slash&&!hash&&!/^(json|html|xml|text|txt|md|markdown|)$/.test(lang)&&lang!="code")return esc(code);if(/^(html|xml|text|txt|md|markdown|code|)$/.test(lang))return esc(code);
+ const re=new RegExp((slash?"(\\/\\/[^\\n]*|\\/\\*[\\s\\S]*?\\*\\/)":"(#[^\\n]*)")+"|(\"(?:\\\\.|[^\"\\\\\\n])*\"|'(?:\\\\.|[^'\\\\\\n])*'|`(?:\\\\.|[^`\\\\])*`)|(\\b\\d+(?:\\.\\d+)?\\b)|([A-Za-z_]\\w*)","g");let o="",last=0,m;
+ if(lang=="json"){return esc(code).replace(/(&quot;|")([^"\n]*)\1(\s*:)/g,'<span class="tk">$1$2$1</span>$3').replace(/: ?("[^"\n]*")/g,': <span class="ts">$1</span>').replace(/\b(-?\d+(?:\.\d+)?)\b/g,'<span class="tn">$1</span>')}
+ while(m=re.exec(code)){o+=esc(code.slice(last,m.index));last=re.lastIndex;const t=esc(m[0]);o+=m[1]?`<span class="tc">${t}</span>`:m[2]?`<span class="ts">${t}</span>`:m[3]?`<span class="tn">${t}</span>`:KW.has(m[0])?`<span class="tk">${t}</span>`:t}
+ return o+esc(code.slice(last))}
+const codeBlock=(l,c)=>`<div class="cbk"><div class="cbh"><span>${esc(l||"code")}</span><button class="cbc">${I("copy")}<span>Copy code</span></button></div><pre><code>${hl(c,(l||"").toLowerCase())}</code></pre></div>`,
+link=(u,x)=>/^(https?:\/\/|mailto:|tel:|\/|#)/i.test(u)?`<a href="${u.replace(/"/g,"%22")}" target="_blank" rel="noopener noreferrer">${x}</a>`:x;
+function inl(t){const st=[],hold=h=>"\u0000"+(st.push(h)-1)+"\u0000";
+ t=t.replace(/`([^`\n]+)`/g,(_,c)=>hold("<code>"+esc(c)+"</code>")).replace(/\\\((.+?)\\\)/g,(_,m)=>hold(mathEl(m,0))).replace(/(?<![\\$\d])\$(?=[^\s$])([^$\n]+?)(?<=[^\s$])\$(?!\d)/g,(_,m)=>hold(mathEl(m,0)));
+ t=esc(t).replace(/\[([^\]]+)\]\(([^)\s]+)\)/g,(_,x,u)=>hold(link(u,x))).replace(/(https?:\/\/[^\s<>\u0000]+[^\s<>.,;:!?)\u0000])/g,u=>hold(link(u,u)));
+ t=t.replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/(?<![\w*])\*(?!\s)(.+?)(?<!\s)\*(?![\w*])/g,"<i>$1</i>").replace(/~~(.+?)~~/g,"<s>$1</s>").replace(/(?<![\w])_(?!\s)(.+?)(?<!\s)_(?!\w)/g,"<i>$1</i>");
+ for(let k=0;k<3;k++)t=t.replace(/\u0000(\d+)\u0000/g,(_,i)=>st[i]);return t}
+function md(src){const blocks=[];src=src.replace(/```([\w+#.-]*)[^\n]*\n([\s\S]*?)```/g,(_,l,c)=>"\n\u0001"+(blocks.push(codeBlock(l,c.replace(/\n$/,"")))-1)+"\u0001\n")
+  .replace(/\$\$([\s\S]+?)\$\$|\\\[([\s\S]+?)\\\]/g,(_,a,b)=>"\n\u0001"+(blocks.push(mathEl((a||b).trim(),1))-1)+"\u0001\n");
+ const L=src.split("\n"),out=[],LI=/^\s*([-*+]|\d+[.)])\s+/,TS=/^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$/;let i=0;
+ while(i<L.length){const ln=L[i];let m;if(!ln.trim()){i++;continue}
+  if(m=/^\u0001(\d+)\u0001$/.exec(ln.trim())){out.push(blocks[m[1]]);i++;continue}
+  if(m=/^(#{1,6})\s+(.*)$/.exec(ln)){const n=Math.min(m[1].length,4);out.push(`<h${n} class="mh">${inl(m[2])}</h${n}>`);i++;continue}
+  if(/^\s*([-*_])(\s*\1){2,}\s*$/.test(ln)){out.push("<hr>");i++;continue}
+  if(ln.includes("|")&&i+1<L.length&&TS.test(L[i+1])){const cells=r=>r.trim().replace(/^\|/,"").replace(/\|$/,"").split("|").map(x=>x.trim()),al=cells(L[i+1]).map(x=>/^:-+:$/.test(x)?"center":/-:$/.test(x)?"right":"left"),hd=cells(ln),rows=[];i+=2;while(i<L.length&&L[i].trim()&&L[i].includes("|")){rows.push(cells(L[i]));i++}
+   out.push(`<div class="tbw"><table><thead><tr>${hd.map((c,k)=>`<th style="text-align:${al[k]||"left"}">${inl(c)}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>"<tr>"+hd.map((_,k)=>`<td style="text-align:${al[k]||"left"}">${inl(r[k]||"")}</td>`).join("")+"</tr>").join("")}</tbody></table></div>`);continue}
+  if(/^\s*>/.test(ln)){const q=[];while(i<L.length&&/^\s*>/.test(L[i])){q.push(L[i].replace(/^\s*>\s?/,""));i++}out.push("<blockquote>"+md(q.join("\n"))+"</blockquote>");continue}
+  if(LI.test(ln)){const ord=/^\s*\d/.test(ln),it=[];while(i<L.length&&LI.test(L[i])&&/^\s*\d/.test(L[i])==ord){it.push(L[i].replace(LI,""));i++}const tg=ord?"ol":"ul";out.push(`<${tg}>${it.map(x=>"<li>"+inl(x)+"</li>").join("")}</${tg}>`);continue}
+  const p=[];while(i<L.length&&L[i].trim()&&!/^(#{1,6}\s|\s*>|\u0001)/.test(L[i])&&!LI.test(L[i])&&!(L[i].includes("|")&&TS.test(L[i+1]||""))){p.push(L[i]);i++}
+  if(!p.length){p.push(ln);i++}out.push("<p>"+p.map(inl).join("<br>")+"</p>")}
+ return out.join("")}
+const ACTB="file:|edit:|read:|run|search|fetch|weather|image|remember|remind|telegram|mail|inbox|say|gslides|gsheets|gdoc|gform|gcal|gdrive|gmail|google",STRIP=new RegExp("```(?:"+ACTB+")[^\\n]*\\n[\\s\\S]*?```","g"),
+plainSpeech=t=>t.replace(/```[\s\S]*?```/g," ").replace(/\$\$[\s\S]*?\$\$/g," ").replace(/^\s*\|.*$/gm," ").replace(/!?\[([^\]]*)\]\([^)]*\)/g,"$1").replace(/https?:\/\/\S+/g," ").replace(/^#{1,6}\s*/gm,"").replace(/^\s*[-*+>]\s+/gm,"").replace(/[*_`~#|$\\]/g,"").replace(/\s+/g," ").trim().slice(0,320);
+function add(c,t,nolog){const d=document.createElement("div");d.className="m "+c;if(c=="ai"&&t){d.classList.add("rich");d.innerHTML=md(t);upgradeMath(d)}else d.textContent=t;if(c=="ai"&&t){const x=document.createElement("button");x.className="cp";x.title="Copy";x.innerHTML=I("copy");x.onclick=()=>copyText(t);d.append(x)}$("#chat").append(d);d.scrollIntoView();syncEmpty();if(!nolog&&c!="err"){LOG.push({c,t});sv()}return d}
+let turnBusy=0;const syncEmpty=()=>document.body.classList.toggle("empty",!$("#chat").children.length);
+const envObj=()=>{const o={};(S.env||"").split("\n").forEach(l=>{const m=l.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/);if(m)o[m[1]]=m[2].trim()});return o};
+function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("on");clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove("on"),1600)}
+async function copyText(t){try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement("textarea");a.value=t;document.body.append(a);a.select();document.execCommand("copy");a.remove()}toast("Copied to clipboard")}
+function card(ic,h){const b=document.createElement("div");b.className="cmd";const hd=document.createElement("div");hd.className="h";hd.innerHTML=I(ic);const ht=document.createElement("span");ht.className="ht";ht.textContent=h;const ac=document.createElement("span");ac.className="ac";hd.append(ht,ac);b.append(hd);$("#chat").append(b);b.scrollIntoView();syncEmpty();b.out="";
+ b.btn=(icn,label,fn)=>{const x=document.createElement("button");x.className="cb";x.innerHTML=I(icn)+"<span>"+label+"</span>";x.onclick=()=>fn(x);ac.append(x);return x};
+ b.add=(t,k)=>{if(!t||!String(t).trim())return;const e=document.createElement("div");if(k=="ok"){e.className="x";e.innerHTML=I("check")}else if(k=="bad"){e.className="e";e.innerHTML=I("x")}else{e.className=k||"";b.out+=String(t)+"\n"}e.append(String(t));b.append(e);b.scrollIntoView()};return b}
+function finishRun(b,c,o,ms){b.add(o.stdout);b.add(o.stderr||o.error,"e");const s=(ms/1000).toFixed(1)+"s";b.add(o.code==0?"Finished (exit 0) · "+s:"Failed (exit "+o.code+") · "+s,o.code==0?"ok":"bad");
+ b.btn("copy","Copy command",()=>copyText(c));b.btn("copy","Copy output",()=>copyText(b.out.trim()||"(no output)"));b.btn("replay","Run again",()=>runDirect(c))}
+async function runDirect(c){const b=card("term","$ "+c),t0=performance.now();st("run");const o=await post("/run",{cmd:c,env:envObj()});finishRun(b,c,o,performance.now()-t0);st(o.code?"error":"idle")}
+function fileBtns(b,n,abs){b.btn("ext","Open",()=>open("/apps/"+n));b.btn("code","Edit",async()=>{cur=n;if(!document.body.classList.contains("ed"))await edOpen();await edLoad(n)});b.btn("copy","Copy path",()=>copyText(abs||n))}
+/* ---------- voice ---------- */
+function voice(){const v=speechSynthesis.getVoices();return(S.vn&&v.find(x=>x.name==S.vn))||v.find(x=>/en/i.test(x.lang)&&/male|david|daniel|george|guy|alex|ryan/i.test(x.name)&&!/female/i.test(x.name))||v.find(x=>/en/i.test(x.lang))}
+function say1(s,my){return new Promise(async r=>{const shown=()=>{speaking=1;$("#sub").className="";$("#sub").textContent=s;if(my==gen&&!["run","think","error"].includes(document.body.dataset.s))st("speak")};
+ if(S.el&&!ELFAIL){try{const x=await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${S.elv||"pNInz6obpgDQGcFmaJgB"}`,{method:"POST",headers:{"xi-api-key":S.el,"Content-Type":"application/json"},body:JSON.stringify({text:s,model_id:"eleven_turbo_v2_5"})});if(!x.ok)throw Error("HTTP "+x.status);
+   if(my!=gen)return r();const a=new Audio(URL.createObjectURL(await x.blob()));curA=a;audR=r;a.onplay=shown;a.onended=a.onerror=()=>{speaking=0;r()};await a.play();return}catch(e){ELFAIL=1;add("err","The ElevenLabs voice failed ("+e.message+"). Using the browser voice instead.",1)}}
+ const u=new SpeechSynthesisUtterance(s);u.voice=voice();u.pitch=.85;u.rate=S.vr||1;u.onstart=shown;u.onboundary=()=>lv=.55;u.onend=u.onerror=()=>{speaking=0;r()};speechSynthesis.speak(u)})}
+async function speak(t,my=gen){t=(t||"").replace(/[`*#_]/g,"").trim();if(!t)return;spoken=t.toLowerCase();
+ if(!S.voice){$("#sub").className="";$("#sub").textContent=t;return}
+ for(const s of t.match(/[^.!?\n]+[.!?]*/g)||[t]){if(my!=gen)return;await say1(s.trim(),my)}
+ if(my==gen){speaking=0;if(document.body.dataset.s=="speak")idle();setTimeout(()=>{if(!speaking&&my==gen&&!live)$("#sub").textContent=""},3000)}}
+function interrupt(){gen++;ctl&&ctl.abort();speechSynthesis.cancel();curA&&curA.pause();audR&&audR();speaking=0}
+/* ---------- LLM ---------- */
+const norm=m=>{const o=[];for(const x of m){if(o.length&&o[o.length-1].role==x.role)o[o.length-1]={role:x.role,content:o[o.length-1].content+"\n\n"+x.content};else o.push({...x})}return o};
+async function llm(sys,msgs,sig){const {p,k,m}=S,base=S.u||P[p][0];msgs=norm(msgs);
+ if(p=="gemini"){const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${k}`,{method:"POST",signal:sig,headers:{"Content-Type":"application/json"},body:JSON.stringify({systemInstruction:{parts:[{text:sys}]},contents:msgs.map(x=>({role:x.role=="user"?"user":"model",parts:[{text:x.content}]}))})}),j=await r.json();
+  if(!r.ok)throw Error(j.error?.message||r.status);return j.candidates?.[0]?.content?.parts?.map(x=>x.text).join("")||""}
+ if(p=="anthropic"){const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",signal:sig,headers:{"content-type":"application/json","x-api-key":k,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:m,max_tokens:4096,system:sys,messages:msgs})}),j=await r.json();
+  if(!r.ok)throw Error(j.error?.message||r.status);return j.content.map(x=>x.text||"").join("")}
+ const r=await fetch(base.replace(/\/$/,"")+"/chat/completions",{method:"POST",signal:sig,headers:{"Content-Type":"application/json",...(k?{Authorization:"Bearer "+k}:{})},body:JSON.stringify({model:m,messages:[{role:"system",content:sys},...msgs]})}),j=await r.json();
+ if(!r.ok)throw Error(j.error?.message||JSON.stringify(j.error||j));return j.choices[0].message.content}
+const SYS=()=>`You are Jarvis, a calm, concise, friendly male assistant who can act on the user's computer. ${PERSONA[S.persona]}
+Now: ${new Date().toString()} (timezone ${TZ}). Host OS: ${INFO.os}, shell: ${INFO.shell}, working dir: ${INFO.cwd}. Apps folder (all projects live here): ${INFO.apps}. Existing items: ${(INFO.list||[]).join(", ")||"none"}.
+Things you remember about the user: ${(INFO.mem||[]).join(" | ")||"nothing yet"}.
+Anything in the apps folder is served at ${INFO.url}apps/<project>/<file> - give that link for web projects, or run python -m http.server PORT (detached) for other hosting.
+You act with fenced blocks. Use any number of action blocks plus at most ONE run block per message; results come back and you continue until done. Your final message has no blocks and briefly says what happened - state any error plainly.
+${F}file:project/sub/name.ext  (then the FULL file content, then a closing fence) creates or overwrites a file; folders are created automatically; never put code fences inside file content.
+${F}edit:project/name.ext  (then blocks: <<<<<<< SEARCH / exact old lines / ======= / new lines / >>>>>>> REPLACE) makes small updates to an existing file.
+${F}read:project/name.ext  (closing fence on the next line) shows you a file. Your own source is @self/index.html (UI) and @self/server.py (backend): you may read and edit them to improve yourself (UI changes show after reload, backend after restart).
+${F}run  (then ONE shell command) runs any command in the user's REAL, persistent terminal (cd and environment carry over, the user watches it live and can type there too). Use ${INFO.os} syntax. A foreground server blocks the terminal, so start servers in the background (end the command with &).
+${F}search / ${F}fetch / ${F}weather  (then a query / a URL / a city) look things up on the live web.   ${F}image  (then a prompt) generates and shows a picture.
+${F}remember  (then one short fact) saves it to long-term memory.   ${F}remind  (then: minutes | message) sets a reminder.   ${F}telegram  (then a message) pings the user's phone.
+${F}mail  (then JSON {"to":"","subject":"","body":"<html allowed>","html":true}) sends email.   ${F}inbox  (then a number) reads the latest emails.
+Environment variables available to your commands (values hidden): ${Object.keys(envObj()).join(", ")||"none"}. Use them for git push, gh, vercel, netlify and similar tools.
+GOOGLE WORKSPACE (works only if the user pressed Connect Google in Settings; otherwise the result says so and you tell them how). Each block holds JSON, then you get the link back and share it:
+${F}gslides  {"title":"Space","theme":"dark|midnight|ocean|forest|sunset|light (or {bg,title,text} hex colours)","slides":[{"type":"title","title":"..","subtitle":".."},{"type":"bullets","title":"..","bullets":["..",".."],"notes":"speaker notes"},{"type":"section","title":".."},{"type":"table","title":"..","table":[["Col A","Col B"],["x","y"]]},{"type":"image","title":"..","image":"https://public-image-url"}]}  makes a Google Slides deck.
+${F}gsheets  {"title":"Budget","sheets":[{"name":"Q1","rows":[["Item","Cost"],["Rent",1200],["Total","=SUM(B2:B2)"]],"chart":{"type":"COLUMN|BAR|LINE|AREA|PIE","title":".."}}]}  makes a Google Sheet; row 1 is a styled header, formulas start with =.
+${F}gdoc  {"title":"Report","html":"<h1>..</h1><p>..</p><ul><li>..</li></ul><table>..</table>"}  makes a Google Doc from HTML.
+${F}gform  {"title":"Feedback","description":"..","quiz":false,"questions":[{"title":"..","type":"text|paragraph|choice|checkbox|dropdown|scale|date|time|section","options":["A","B"],"required":true,"low":1,"high":5,"lowLabel":"..","highLabel":"..","correct":"A","points":1}]}  makes a Google Form or graded quiz (correct and points only when quiz is true).
+${F}gcal  {"action":"create","summary":"..","start":"2026-11-20T15:00","end":"2026-11-20T16:00","timezone":"${TZ}","attendees":["a@b.com"],"meet":true,"description":"..","location":"..","reminders":[10],"recurrence":"RRULE:FREQ=WEEKLY;COUNT=4"} also {"action":"list","days":7} and {"action":"delete","id":".."}. Date-only start makes an all-day event.
+${F}gdrive  {"action":"list|search|mkdir|upload|share|read|trash","query":"..","name":"..","path":"project/file.pdf (a local file in apps)","convert":"sheet|doc|slides","folder":"folderId","id":"fileId","email":"..","role":"reader|writer","anyone":true}
+${F}gmail  {"action":"send|list|read","to":"..","subject":"..","body":"<html allowed>","query":"is:unread","limit":5,"id":"messageId"}
+${F}google  {"method":"GET|POST|PATCH|DELETE","url":"https://tasks.googleapis.com/...","body":{}} calls any other Google API (Tasks, Contacts via people.googleapis.com, YouTube, ...). Only *.googleapis.com is allowed.
+When making slides, sheets or forms, use real, useful content and pick a theme/chart that suits it.
+Files the user uploads are in apps/uploads/. To phone someone: read apps/contacts.json if it exists, then run xdg-open tel:NUMBER (Linux) or start tel:NUMBER (Windows).
+FORMAT: your chat reply is rendered as rich markdown, so make answers visual and easy to scan: ## headings, **bold**, bullet and numbered lists, tables (| a | b | with a |---|---| row) for comparisons and data, > quotes, clickable links [text](https://...), LaTeX math ($x^2$ inline, $$...$$ for display formulas), and normal fenced code blocks with a language tag (${F}python, ${F}js, ${F}bash) for code you merely show the user. Never use these reserved fence tags for display code: file, edit, read, run, search, fetch, weather, image, remember, remind, telegram, mail, inbox, say, gslides, gsheets, gdoc, gform, gcal, gdrive, gmail, google. Be concise, no filler.
+When your reply has more than one sentence of text, end it with ${F}say  (then one or two short, natural, plain sentences to speak aloud, no markdown or symbols, then a closing fence). Only that is spoken; the rest is just shown. You may create any helper file or tool you need.`;
+const GACT=/```(gslides|gsheets|gdoc|gform|gcal|gdrive|gmail|google)\n([\s\S]*?)\n```/g,GMETA={gslides:["slides","Google Slides"],gsheets:["table","Google Sheets"],gdoc:["file","Google Docs"],gform:["form","Google Forms"],gcal:["calendar","Google Calendar"],gdrive:["cloud","Google Drive"],gmail:["mail","Gmail"],google:["globe","Google API"]},
+gReadOnly=(k,s)=>(k=="gcal"&&s.action=="list")||(k=="gdrive"&&["list","search","read"].includes(s.action||"list"))||(k=="gmail"&&["list","read"].includes(s.action||"list"))||(k=="google"&&(s.method||"GET").toUpperCase()=="GET");
+const FILE=/```file:([^\n]+)\n([\s\S]*?)\n```/g,EDIT=/```edit:([^\n]+)\n([\s\S]*?)\n```/g,READ=/```read:([^\n]+)\n```/g,ACT=/```(search|fetch|weather|image|remember|remind|telegram)\n([\s\S]*?)\n```/g;
+function applyDiff(code,diff){diff=diff.replace(/^```.*$/gm,"");const re=/<<<<<<< SEARCH\n([\s\S]*?)\n=======\n([\s\S]*?)\n>>>>>>> REPLACE/g;let out=code,cnt=0,lines=[],m;
+ while(m=re.exec(diff)){let i=out.indexOf(m[1]),len=m[1].length;
+  if(i<0){const t=m[1].trim().split("\n").map(l=>l.trim().replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).join("\\s*"),x=t&&new RegExp(t).exec(out);if(x){i=x.index;len=x[0].length}}
+  if(i<0){out+="\n"+m[2];lines.push(out.split("\n").length-m[2].split("\n").length+1)}else{lines.push(out.slice(0,i).split("\n").length);out=out.slice(0,i)+m[2]+out.slice(i+len)}cnt++}
+ return{out,cnt,lines}}
+let askRes=null;
+function ask(c){return new Promise(res=>{const b=document.createElement("div");b.className="cmd ask";const hd=document.createElement("div");hd.className="h";hd.innerHTML=I("term");hd.append(" Approve? "+c);b.append(hd);
+ const done=v=>{b.remove();askRes=null;if(v==2){S.auto=true;save()}res(v?1:0)};askRes=done;
+ for(const [t,v,cl] of [["Approve",1,""],["Always approve",2,"pri"],["Deny",0,""]]){const x=document.createElement("button");x.textContent=t;x.className=cl;x.style.margin="8px 0 8px 10px";x.onclick=()=>done(v);b.append(x)}
+ (live?document.body:$("#chat")).append(b);b.scrollIntoView();if(live)speak("I need your approval. Say yes, always, or no.")})}
+/* ---------- agent loop ---------- */
+async function turn(text){interrupt();const my=gen;turnBusy=1;ctl=new AbortController();add("u",text);H.push({role:"user",content:text});INFO=await post("/info");
+ try{for(let i=0;i<10&&my==gen;i++){st("think");const d=add("ai","",1);d.innerHTML=DOTS;let r;
+  try{r=await llm(SYS(),H,ctl.signal)}catch(e){d.remove();if(my!=gen||e.name=="AbortError")return;add("err","API error: "+e.message);st("error");speak("Sorry, the API returned an error. "+e.message.slice(0,110),my);return}
+  d.remove();if(my!=gen)return;H.push({role:"assistant",content:r});
+  const sm=r.match(/```say\n([\s\S]*?)\n```/),txt=r.replace(STRIP,"").trim();if(txt){add("ai",txt);speak(sm?sm[1]:plainSpeech(txt),my)}else if(sm)speak(sm[1],my)
+  let fb="";
+  for(const f of r.matchAll(FILE)){st("run");const n=f[1].trim(),o=await post("/write",{path:n,content:f[2]}),b=card("file",n);b.add(o.ok?"Saved to apps/"+n:o.error,o.ok?"ok":"bad");if(o.ok)fileBtns(b,n,o.path);fb+=o.ok?`[Saved ${n}]\n`:`[File error ${n}: ${o.error}]\n`;if(o.ok)edRefresh(n)}
+  for(const f of r.matchAll(EDIT)){st("run");const n=f[1].trim(),g=await post("/read",{path:n}),b=card("pen",n);if(!g.ok){b.add(g.error,"bad");fb+=`[Edit failed ${n}: ${g.error}]\n`;continue}
+   const x=applyDiff(g.content,f[2]);await post("/write",{path:n,content:x.out});b.add(x.cnt+" change(s) applied","ok");fb+=`[Edited ${n}: ${x.cnt} change(s)]\n`;edRefresh(n)}
+  for(const f of r.matchAll(READ)){const n=f[1].trim(),g=await post("/read",{path:n}),b=card("eyeb",n);b.add(g.ok?"Read "+g.content.length+" characters":g.error,g.ok?"ok":"bad");fb+=g.ok?`[Contents of ${n}]\n${g.content.slice(0,14000)}\n`:`[Read failed ${n}: ${g.error}]\n`}
+  for(const a of r.matchAll(ACT)){const k=a[1],v=a[2].trim();st("run");
+   if(k=="search"){const b=card("search","Search: "+v),o=await post("/search",{q:v,key:S.tv});b.add(o.ok?o.results.length+" result(s)":o.error,o.ok?"ok":"bad");fb+=o.ok?"[Search results]\n"+JSON.stringify(o.results)+"\n":`[Search failed: ${o.error}]\n`}
+   else if(k=="fetch"){const b=card("globe","Read page: "+v.slice(0,70)),o=await post("/fetch",{url:v});b.add(o.ok?"Read "+o.text.length+" characters":o.error,o.ok?"ok":"bad");fb+=o.ok?"[Page text]\n"+o.text+"\n":`[Fetch failed: ${o.error}]\n`}
+   else if(k=="weather"){const b=card("sun","Weather: "+v),o=await post("/weather",{city:v});b.add(o.ok?o.place+": "+o.current.temperature_2m+" °C":o.error,o.ok?"ok":"bad");fb+=o.ok?"[Weather]\n"+JSON.stringify(o)+"\n":`[Weather failed: ${o.error}]\n`}
+   else if(k=="image"){const d2=document.createElement("div");d2.className="m ai";const im=new Image();im.src="https://image.pollinations.ai/prompt/"+encodeURIComponent(v)+"?width=768&height=768&nologo=true";im.alt=v;d2.append(im);$("#chat").append(d2);d2.scrollIntoView();fb+="[Image shown to the user]\n"}
+   else if(k=="remember"){const o=await post("/mem",{op:"add",text:v}),b=card("book","Remembered: "+v.slice(0,80));b.add("Saved to long-term memory","ok");fb+="[Remembered]\n"}
+   else if(k=="remind"){const q=v.split("|"),mins=parseFloat(q[0])||1,msg=(q[1]||q[0]).trim(),b=card("bell","Reminder in "+mins+" min: "+msg);b.add("Set (cleared if you reload the page)","ok");
+    setTimeout(async()=>{add("ai","Reminder: "+msg);speak("Reminder. "+msg,gen);if(S.tgt)post("/telegram",{token:S.tgt,chat:S.tgc,text:"Reminder: "+msg})},mins*60000);fb+=`[Reminder set for ${mins} min]\n`}
+   else if(k=="telegram"){const b=card("send","Telegram"),o=await post("/telegram",{token:S.tgt,chat:S.tgc,text:v});b.add(o.ok?"Sent":o.error,o.ok?"ok":"bad");fb+=o.ok?"[Telegram sent]\n":`[Telegram failed: ${o.error}]\n`}}
+  for(const a of r.matchAll(GACT)){const k=a[1];st("run");let sp;try{sp=JSON.parse(a[2])}catch(e){fb+=`[Invalid JSON in the ${k} block: ${e.message}. Fix it and try again.]\n`;card("x",GMETA[k][1]).add("The model sent invalid JSON","bad");continue}
+   const ro=gReadOnly(k,sp),b=card(GMETA[k][0],GMETA[k][1]+(sp.title?": "+sp.title:sp.summary?": "+sp.summary:sp.action?": "+sp.action:""));
+   if(!ro&&!S.auto&&!await ask("Google: "+GMETA[k][1]+" "+(sp.title||sp.summary||sp.action||""))){fb+=`[User denied ${k}]\n`;b.add("Denied","bad");continue}
+   const o=await post("/google/do",{kind:k,spec:sp,tz:TZ});
+   if(!o.ok){b.add(o.error,"bad");fb+=`[${k} failed: ${o.error}]\n`}else{b.add(o.summary||"Done","ok");if(o.url){b.btn("ext","Open",()=>open(o.url));b.btn("copy","Copy link",()=>copyText(o.url))}if(o.share_link)b.btn("send","Share link",()=>copyText(o.share_link));if(o.meet)b.btn("phone","Meet link",()=>open(o.meet));fb+=`[${k} result] ${JSON.stringify(o).slice(0,6000)}\n`}}
+  const mm=r.match(/```mail\n([\s\S]*?)\n```/),ib=r.match(/```inbox\n?(\d*)\s*```/);
+  if(mm){try{const j=JSON.parse(mm[1]),b=card("mail",j.to+": "+j.subject);if(S.auto||await ask("Send email to "+j.to+": "+j.subject)){const o=await post("/mail/send",{...j,user:S.ma,pw:S.mp,smtp:S.ms});b.add(o.ok?"Sent":o.error,o.ok?"ok":"bad");fb+=o.ok?"[Email sent]\n":`[Email failed: ${o.error}]\n`}else fb+="[User denied the email]\n"}catch(e){fb+="[Bad mail JSON]\n"}}
+  if(ib){const b=card("inbox","Inbox"),o=await post("/mail/inbox",{user:S.ma,pw:S.mp,imap:S.mi,n:ib[1]});b.add(o.ok?o.mails.length+" email(s) read":o.error,o.ok?"ok":"bad");fb+=o.ok?"[Inbox]\n"+JSON.stringify(o.mails)+"\n":`[Inbox failed: ${o.error}]\n`}
+  const run=r.match(/```run\w*\n([\s\S]*?)```/);
+  if(!run){if(fb){H.push({role:"user",content:fb});continue}return}
+  const c=run[1].trim();if(!S.auto&&!await ask("$ "+c)){H.push({role:"user",content:fb+"[The user denied the command]"});add("ai","Command denied.");return}
+  if(my!=gen)return;st("run");$("#sub").className="dim";$("#sub").textContent="Running: "+c.slice(0,90);tmAI(c);const b=card("term","$ "+c),t0=performance.now(),o=await post("/run",{cmd:c,env:envObj()});tmAI("");if(my!=gen)return;
+  finishRun(b,c,o,performance.now()-t0);if(o.code)st("error");await sleep(500);
+  H.push({role:"user",content:fb+`[Command output] exit code ${o.code}\nstdout:\n${o.stdout}\nstderr:\n${o.stderr}`})}}
+ finally{sv();if(my==gen)turnBusy=0;if(my==gen&&!speaking){const s=document.body.dataset.s;if(s=="think"||s=="run")idle();else if(s=="error")setTimeout(()=>{if(my==gen&&document.body.dataset.s=="error")idle()},3000)}}}
+/* ---------- live call ---------- */
+async function micOn(){try{micS=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}});const c=new AudioContext(),a=c.createAnalyser();a.fftSize=256;c.createMediaStreamSource(micS).connect(a);an=a}catch(e){}}
+const buf=new Uint8Array(128);(function loop(){if(an&&live&&!speaking&&!muted){an.getByteFrequencyData(buf);lv=Math.max(lv,buf.reduce((x,y)=>x+y,0)/128/80)}lv*=.9;document.body.style.setProperty("--lv",Math.min(lv,1).toFixed(3));requestAnimationFrame(loop)})();
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+function listen(){if(!live||muted)return;rec=new SR();rec.continuous=true;rec.interimResults=true;rec.lang=navigator.language||"en-US";
+ rec.onresult=e=>{let it="",fin="";for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;e.results[i].isFinal?fin+=t:it+=t}
+  if(askRes&&!speaking){if(fin.trim()){const s=fin.toLowerCase(),v=/always|from now on|stop asking|don't ask/.test(s)?2:/\b(no|nope|deny|stop|cancel|don't)\b/.test(s)?0:/\b(yes|yeah|yep|approve|go ahead|do it|sure|ok|okay|run it|proceed)\b/.test(s)?1:-1;if(v>=0)askRes(v)}return}
+  const w=((it||fin).toLowerCase().match(/\w+/g))||[];if(speaking&&(w.length<2||w.every(x=>spoken.includes(x))))return;
+  if(speaking||document.body.dataset.s=="think")interrupt();if(!muted){$("#sub").className="dim";$("#sub").textContent="“"+(it||fin).trim()+"”"}if(fin.trim())turn(fin.trim())};
+ rec.onend=()=>{if(live&&!muted)setTimeout(listen,120)};rec.onerror=()=>{};try{rec.start()}catch(e){}}
+const muteUi=()=>{$("#bMute").innerHTML=I(muted?"micx":"mic")+(muted?" Unmute":" Mute")};
+async function liveOn(){if(!SR)return add("err","Live call needs Chrome or Edge (speech recognition).");live=1;muted=0;muteUi();document.body.classList.add("live");document.documentElement.requestFullscreen?.().catch(()=>{});await micOn();st("listen");listen();speak("I'm listening.")}
+function liveOff(){live=0;rec&&rec.abort();interrupt();micS&&micS.getTracks().forEach(t=>t.stop());an=null;document.body.classList.remove("live");document.fullscreenElement&&document.exitFullscreen();st("idle");$("#sub").textContent=""}
+$("#bLive").onclick=liveOn;$("#bEnd").onclick=liveOff;addEventListener("keydown",e=>{if(e.key=="Escape"&&live)liveOff()});
+$("#bMute").onclick=()=>{muted=!muted;muteUi();if(muted){rec&&rec.abort();$("#sub").textContent=""}else listen()};
+/* ---------- code editor ---------- */
+let E=null,cur="",loading=0,saveT,orig="";
+const LANG={py:"python",js:"javascript",html:"html",htm:"html",css:"css",json:"json",md:"markdown",sh:"shell",ts:"typescript",java:"java",c:"c",cpp:"cpp"};
+function loadMonaco(){return new Promise(r=>{if(window.monaco)return r();const B="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/",s=document.createElement("script");s.src=B+"vs/loader.js";
+ s.onload=()=>{window.MonacoEnvironment={getWorkerUrl:()=>URL.createObjectURL(new Blob([`self.MonacoEnvironment={baseUrl:"${B}"};importScripts("${B}vs/base/worker/workerMain.js")`],{type:"text/javascript"}))};
+  require.config({paths:{vs:B+"vs"}});require(["vs/editor/editor.main"],()=>{monaco.editor.defineTheme("darcula",{base:"vs-dark",inherit:true,rules:[{token:"keyword",foreground:"CC7832"},{token:"string",foreground:"6A8759"},{token:"comment",foreground:"808080",fontStyle:"italic"},{token:"number",foreground:"6897BB"},{token:"tag",foreground:"E8BF6A"},{token:"attribute.name",foreground:"BABABA"},{token:"type",foreground:"A9B7C6"}],colors:{"editor.background":"#2B2B2B","editor.lineHighlightBackground":"#323232","editorLineNumber.foreground":"#606366","editorGutter.background":"#313335","editor.selectionBackground":"#214283"}});r()},()=>r())};
+ s.onerror=()=>r();document.head.append(s)})}
+function mkMonaco(host){const m=monaco.editor.create(host,{theme:"darcula",automaticLayout:true,minimap:{enabled:true},fontSize:13,value:"// Pick a file above, or ask Jarvis to create one."});let dec=[];
+ m.addCommand(monaco.KeyMod.CtrlCmd|monaco.KeyCode.KeyS,edSave);m.addCommand(monaco.KeyMod.CtrlCmd|monaco.KeyCode.KeyI,()=>$("#ai2").focus());m.addCommand(monaco.KeyMod.CtrlCmd|monaco.KeyMod.Shift|monaco.KeyCode.KeyP,()=>cur&&open("/apps/"+cur));
+ return{get:()=>m.getValue(),set:v=>m.setValue(v),onch:f=>m.onDidChangeModelContent(f),lang:x=>monaco.editor.setModelLanguage(m.getModel(),LANG[x]||"plaintext"),
+  async scan(l){m.revealLineInCenter(l);dec=m.deltaDecorations(dec,[{range:new monaco.Range(l,1,l,1),options:{isWholeLine:true,className:"scan"}}]);await sleep(550)},clear(){dec=m.deltaDecorations(dec,[])}}}
+function mkText(host){host.innerHTML='<div class="te"><pre></pre><textarea spellcheck="false" placeholder="Pick a file above, or ask Jarvis to create one."></textarea></div>';const te=host.firstChild,ta=te.querySelector("textarea"),ln=te.querySelector("pre");let cb=()=>{};
+ const upd=()=>{ln.textContent=Array.from({length:ta.value.split("\n").length},(_,i)=>i+1).join("\n")};ta.onscroll=()=>ln.style.transform=`translateY(${-ta.scrollTop}px)`;
+ ta.oninput=()=>{upd();cb()};ta.onkeydown=e=>{if(e.key=="Tab"){e.preventDefault();document.execCommand("insertText",false,"  ")}else if((e.ctrlKey||e.metaKey)&&e.key=="s"){e.preventDefault();edSave()}else if((e.ctrlKey||e.metaKey)&&e.key=="i"){e.preventDefault();$("#ai2").focus()}else if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key.toLowerCase()=="p"){e.preventDefault();cur&&open("/apps/"+cur)}};
+ return{get:()=>ta.value,set:v=>{ta.value=v;upd()},onch:f=>cb=f,lang:()=>{},async scan(l){const h=ta.scrollHeight/Math.max(1,ta.value.split("\n").length);ta.scrollTop=Math.max(0,(l-4)*h);te.classList.add("flash");await sleep(550);te.classList.remove("flash")},clear(){}}}
+const setStat=(t,bad)=>{$("#stat").textContent=t;$("#stat").classList.toggle("bad",!!bad)};
+async function edOpen(){document.body.classList.add("ed");if(!E){setStat("Loading editor…");await Promise.race([loadMonaco(),sleep(8000)]);E=window.monaco?mkMonaco($("#mon")):mkText($("#mon"));
+  E.onch(()=>{if(loading)return;clearTimeout(saveT);saveT=setTimeout(edSave,500)});setStat(window.monaco?"Darcula editor · changes auto-save and update the preview live":"Built-in editor (Monaco couldn't load, so the offline editor is used) · changes auto-save")}
+ edList()}
+async function edList(){const o=await post("/ls");$("#fsel").innerHTML=(o.files||[]).map(f=>`<option>${f}</option>`).join("")||"<option value=''>(no files yet)</option>";
+ if(o.files&&o.files.length&&!cur)edLoad(o.files.find(f=>/\.html?$/.test(f))||o.files[0]);else if(cur)$("#fsel").value=cur}
+async function edLoad(p){if(!E||!p)return;cur=p;$("#fsel").value=p;const o=await post("/read",{path:p});loading=1;E.set(o.content||"");E.lang(p.split(".").pop());loading=0;orig=o.content||"";pvReload()}
+const pvReload=()=>{if(/\.(html?|svg)$/.test(cur))$("#pv").src="/apps/"+cur+"?t="+Date.now()};
+async function edSave(){if(!E||!cur)return;await post("/write",{path:cur,content:E.get()});pvReload();setStat("Saved "+cur+" · "+new Date().toLocaleTimeString())}
+function edRefresh(n){if(!document.body.classList.contains("ed")||!E)return;n==cur?edLoad(n):edList()}
+async function edAI(){const q=$("#ai2").value.trim();if(!q)return;
+ if(!S.k&&S.p!="ollama"){setStat("Add an API key first: open Settings and fill in the AI brain.",1);openSettings();return}
+ if(!cur||!E){$("#ai2").value="";setStat("No file open, so Jarvis will create it from chat.");turn(q);return}
+ const bak=E.get(),t0=performance.now();orig=bak;st("think");setStat("AI is working…");$("#bAI").disabled=true;
+ try{const r=await llm("You are a precise diff generator. Do NOT rewrite the whole file and do not chat. Output ONLY blocks in this exact format, with no markdown fences:\n<<<<<<< SEARCH\n[exact existing lines to change]\n=======\n[new replacement lines]\n>>>>>>> REPLACE",[{role:"user",content:`Instruction: ${q}\n\nCurrent file (${cur}):\n${bak}`}]);
+  const x=applyDiff(bak,r);loading=1;E.set(x.out);loading=0;for(const l of x.lines)await E.scan(l);E.clear();await edSave();
+  setStat(`${x.cnt} change(s) · ${Math.round(performance.now()-t0)} ms · ~${Math.max(0,Math.round((bak.length-r.length)/4))} tokens saved vs a full rewrite`);$("#ai2").value=""}
+ catch(e){setStat("AI error: "+e.message,1);st("error");$("#bAI").disabled=false;return}$("#bAI").disabled=false;idle()}
+$("#bEd").onclick=()=>document.body.classList.contains("ed")?document.body.classList.remove("ed"):edOpen();
+$("#fsel").onchange=e=>edLoad(e.target.value);$("#bSave").onclick=edSave;$("#bPv").onclick=()=>$("#pv").style.display=$("#pv").style.display=="none"?"":"none";
+$("#bTab").onclick=()=>cur&&open("/apps/"+cur);$("#bRev").onclick=()=>{if(E&&orig){E.set(orig);edSave()}};$("#bAI").onclick=edAI;$("#ai2").onkeydown=e=>{if(e.key=="Enter")edAI()};
+$("#bNewF").onclick=async()=>{const n=(prompt("New file path inside apps/ (for example my-app/index.html)")||"").trim();if(!n)return;await post("/write",{path:n,content:""});cur=n;await edList();edLoad(n)};
+/* ---------- settings ---------- */
+function saveFields(){for(const c of CFG)for(const f of c.fields||[]){const e=$("#c_"+f.k);if(e)S[f.k]=f.t=="check"?e.checked:f.t=="range"?+e.value:e.value.trim()}save()}
+async function renderSettings(){const box=$("#sbody");box.innerHTML="";
+ for(const c of CFG){const d=document.createElement("div");d.className="card2";
+  d.innerHTML=`<div class="ch">${I(c.ic)}<b>${c.name}</b><span class="tag ${c.tg||""}">${c.tag}</span></div><div class="why"><b>Why Jarvis needs this:</b> ${c.why}${c.link?` <a href="${c.link}" target="_blank" rel="noopener">Get one →</a>`:""}</div>`;
+  for(const f of c.fields||[]){const l=document.createElement("label");l.textContent=f.l;let e;
+   if(f.t=="select"){e=document.createElement("select");f.o.forEach(o=>e.add(new Option(o,o)))}
+   else if(f.t=="vsel"){e=document.createElement("select");e.add(new Option("Auto (male English)",""));speechSynthesis.getVoices().forEach(v=>e.add(new Option(v.name+" ("+v.lang+")",v.name)))}
+   else if(f.t=="area"){e=document.createElement("textarea");e.rows=4;e.spellcheck=false;if(f.ph)e.placeholder=f.ph}
+   else{e=document.createElement("input");if(f.t)e.type=f.t=="check"?"checkbox":f.t;if(f.ph)e.placeholder=f.ph;if(f.t=="range"){e.min=.7;e.max=1.4;e.step=.05}}
+   e.id="c_"+f.k;if(f.t=="check"){l.className="chk";e.checked=!!S[f.k];d.append(e,l)}else{d.append(l,e);e.value=S[f.k]??""}}
+  if(c.test){const r=document.createElement("div");r.className="row";r.innerHTML='<button id="tst">Test connection</button><span id="tres" class="why"></span>';d.append(r)}
+  box.append(d)}
+ const gs=await post("/google/status"),gd=document.createElement("div");gd.className="card2";
+ gd.innerHTML=`<div class="ch">${I("cloud")}<b>Google Workspace</b><span class="tag ${gs.connected?"free":""}" id="gst">${gs.connected?"Connected":"Not connected"}</span></div>
+ <div class="why"><b>Why Jarvis needs this:</b> It lets him work inside YOUR Google account: build Slides decks (tables, images, speaker notes), Sheets with formulas and charts, Forms and graded quizzes, Docs, calendar events with Meet links, Drive uploads and sharing, Gmail, Tasks and Contacts. Google doesn't allow a shared key for personal data, so you create your own free one once (about 5 minutes). Your keys and login stay on this computer in google_auth.json.</div>
+ <ol class="steps"><li>Open <a href="https://console.cloud.google.com/projectcreate" target="_blank" rel="noopener">Google Cloud Console</a> and create a project.</li><li><b>Enable these APIs</b> (one click each):</li></ol>
+ <div class="gl">${[["Drive","drive"],["Docs","docs"],["Sheets","sheets"],["Slides","slides"],["Forms","forms"],["Calendar","calendar-json"],["Gmail","gmail"],["Tasks","tasks"],["People","people"]].map(([n,s])=>`<a href="https://console.cloud.google.com/apis/library/${s}.googleapis.com" target="_blank" rel="noopener">${n}</a>`).join("")}</div>
+ <ol class="steps" start="3"><li><a href="https://console.cloud.google.com/apis/credentials/consent" target="_blank" rel="noopener">OAuth consent screen</a>: choose <b>External</b> and add your own email as a <b>Test user</b>. Press <b>Publish app</b> afterwards so the login doesn't expire every 7 days (you'll see an "unverified" warning, that's fine for personal use).</li><li><a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener">Credentials</a> → Create credentials → <b>OAuth client ID</b> → application type <b>Desktop app</b>.</li><li>Paste the Client ID and Client secret here and press <b>Connect Google</b>.</li></ol>
+ <label>Client ID</label><input id="g_id" placeholder="${gs.configured?"saved: "+gs.client_id+"…":"1234567890-abc.apps.googleusercontent.com"}"><label>Client secret</label><input id="g_sec" type="password" placeholder="${gs.configured?"saved (leave blank to keep)":"GOCSPX-..."}">
+ <div class="row"><button id="gConn" class="pri">${I("cloud")} Connect Google</button><button id="gDis">Disconnect</button><span id="gmsg" class="why">${gs.connected?"Signed in as "+(gs.email||"your account"):""}</span></div>`;box.append(gd);
+ $("#gConn").onclick=async()=>{const m=$("#gmsg");m.textContent="Opening Google…";const o=await post("/google/auth-url",{client_id:$("#g_id").value.trim(),client_secret:$("#g_sec").value.trim()});if(!o.ok){m.textContent=o.error;return}
+  const w=window.open(o.url,"_blank");m.innerHTML=w?"Finish signing in in the new tab…":`Pop-up blocked. <a href="${o.url}" target="_blank" rel="noopener">Click here to sign in</a>`;
+  for(let i=0;i<90&&$("#gmsg");i++){await sleep(2000);const s=await post("/google/status");if(s.connected){$("#gst").textContent="Connected";$("#gst").className="tag free";$("#gmsg").textContent="Signed in as "+(s.email||"your account");toast("Google connected");return}}};
+ $("#gDis").onclick=async()=>{await post("/google/disconnect");$("#gst").textContent="Not connected";$("#gst").className="tag";$("#gmsg").textContent="Disconnected";toast("Google disconnected")};
+ const m=(await post("/mem",{})).mem||[],d=document.createElement("div");d.className="card2";
+ d.innerHTML=`<div class="ch">${I("book")}<b>Memory</b><span class="tag free">Local</span></div><div class="why"><b>Why Jarvis needs this:</b> Facts he remembers about you between sessions (your name, preferences, projects). They are stored in memory.json on your computer, and he adds to them when you say “remember…”.</div><div class="mem">${m.length?m.map(x=>"<div></div>").join(""):"Nothing remembered yet."}</div><div class="row"><button id="mclr">${I("trash")} Clear memory</button></div>`;
+ d.querySelectorAll(".mem div").forEach((e,i)=>e.textContent=m[i]);box.append(d);
+ const d2=document.createElement("div");d2.className="card2";d2.innerHTML=`<div class="ch">${I("db")}<b>Chat history</b><span class="tag free">Local</span></div><div class="why"><b>Why it's here:</b> Your conversation is kept in this browser so Jarvis remembers context after a reload. Export it or wipe it any time.</div><div class="row"><button id="bExp">${I("dl")} Export chat</button><button id="bClr">${I("trash")} Clear chat</button></div>`;box.append(d2);
+ $("#c_p").onchange=e=>{$("#c_m").value=P[e.target.value][1];$("#c_u").value=P[e.target.value][0]};
+ $("#tst").onclick=async()=>{saveFields();$("#tres").textContent="Testing…";try{const r=await llm("Reply with the single word OK.",[{role:"user",content:"ping"}]);$("#tres").textContent="Connected. He replied: "+r.slice(0,40)}catch(e){$("#tres").textContent="Failed: "+e.message}};
+ $("#mclr").onclick=async()=>{await post("/mem",{op:"clear"});renderSettings()};$("#bClr").onclick=newChat;
+ $("#bExp").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([LOG.map(x=>(x.c=="u"?"You: ":"Jarvis: ")+x.t).join("\n\n")],{type:"text/plain"}));a.download="jarvis-chat.txt";a.click()}}
+function openSettings(){renderSettings();$("#dlg").showModal()}
+$("#bSet").onclick=openSettings;$("#dx").onclick=()=>$("#dlg").close();$("#ok").onclick=()=>{saveFields();$("#dlg").close()};$("#dlg").onclick=e=>{if(e.target==$("#dlg"))$("#dlg").close()};
+/* ---------- UI ---------- */
+function newChat(){interrupt();H=[];LOG=[];sv();$("#chat").innerHTML="";$("#sub").textContent="";st("idle");syncEmpty()}
+async function upload(files){const names=[];for(const f of files){const b64=await new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result.split(",")[1]);x.readAsDataURL(f)}),o=await post("/upload",{name:f.name,b64});if(o.ok){names.push("apps/"+o.path);card("file",f.name).add("Uploaded to apps/"+o.path,"ok")}else add("err","Upload failed: "+o.error)}
+ if(names.length){const t=$("#in").value.trim();$("#in").value="";turn(`[I uploaded: ${names.join(", ")}] ${t||"Take a look at it."}`)}}
+$("#f").onsubmit=async e=>{e.preventDefault();const t=$("#in").value.trim();if(!t)return;$("#in").value="";HIST.push(t);hi=HIST.length;localStorage.jvi=JSON.stringify(HIST.slice(-50));
+ if(t[0]=="!"){add("u",t);const c=t.slice(1).trim(),b=card("term","$ "+c);st("run");const t0=performance.now(),o=await post("/run",{cmd:c,env:envObj()});finishRun(b,c,o,performance.now()-t0);st(o.code?"error":"idle");H.push({role:"user",content:`[I ran this command myself: ${c}]\nexit ${o.code}\n${o.stdout}\n${o.stderr}`});sv();return}
+ turn(t)};
+$("#att").onclick=()=>$("#fi").click();$("#fi").onchange=e=>{upload([...e.target.files]);e.target.value=""};
+addEventListener("dragover",e=>e.preventDefault());addEventListener("drop",e=>{e.preventDefault();if(e.dataTransfer.files.length)upload([...e.dataTransfer.files])});
+$("#bNew").onclick=newChat;$("#bAuto").onclick=()=>{S.auto=!S.auto;save()};$("#bVoice").onclick=()=>{S.voice=!S.voice;speechSynthesis.cancel();save()};$("#bP").onchange=e=>{S.persona=e.target.value;save()};
+$("#bFs").onclick=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();
+$("#mic").onclick=()=>{if(!SR)return add("err","Voice input needs Chrome or Edge.");const r=new SR();r.onresult=e=>turn(e.results[0][0].transcript);r.onend=idle;r.start();st("listen")};
+/* ---------- real terminal (shared with the AI) ---------- */
+const TERMC=["#2e3436","#cc0000","#4e9a06","#c4a000","#3465a4","#75507b","#06989a","#d3d7cf","#555753","#ef2929","#8ae234","#fce94f","#729fcf","#ad7fa8","#34e2e2","#eeeeec"],
+x256=n=>{if(n<16)return TERMC[n];if(n<232){n-=16;const f=v=>v?55+v*40:0;return`rgb(${f(Math.floor(n/36))},${f(Math.floor(n/6)%6)},${f(n%6)})`}const g=8+(n-232)*10;return`rgb(${g},${g},${g})`},
+TM={out:$("#tout"),sc:$("#tmb"),cells:[],col:0,s:{},sk:"",carry:"",pos:0,dec:new TextDecoder(),cols:100,nrows:0,pty:true,busy:false,ai:false};
+TM.out.innerHTML='<div class="tl" id="tcur"></div>';TM.cur=$("#tcur");
+function tmLine(cells){let h="",run="",k=null;const fl=()=>{if(run)h+=k?`<span style="${k}">${esc(run)}</span>`:esc(run);run=""};for(const c of cells){const kk=c?c.k:"";if(kk!==k){fl();k=kk}run+=c?c.c:" "}fl();return h||"&#8203;"}
+function tmNl(){const d=document.createElement("div");d.className="tl";d.innerHTML=tmLine(TM.cells);TM.out.insertBefore(d,TM.cur);TM.cells=[];TM.col=0;if(++TM.nrows>2500){TM.out.firstChild.remove();TM.nrows--}}
+function tmPut(ch){if(TM.col>=TM.cols)tmNl();TM.cells[TM.col++]={c:ch,k:TM.sk}}
+function tmCsi(p,f){const a=p.replace("?","").split(";").map(x=>x===""?0:+x);
+ if(f=="m"){if(!p)a[0]=0;for(let i=0;i<a.length;i++){const n=a[i],S=TM.s;if(n==0)TM.s={};else if(n==1)S.b=1;else if(n==2)S.d=1;else if(n==4)S.u=1;else if(n==22){S.b=0;S.d=0}else if(n==24)S.u=0;else if(n==7)S.r=1;else if(n==27)S.r=0;
+   else if(n>=30&&n<=37)S.fg=TERMC[n-30];else if(n>=90&&n<=97)S.fg=TERMC[n-82];else if(n==39)S.fg=null;else if(n>=40&&n<=47)S.bg=TERMC[n-40];else if(n>=100&&n<=107)S.bg=TERMC[n-92];else if(n==49)S.bg=null;
+   else if(n==38||n==48){const key=n==38?"fg":"bg";if(a[i+1]==5){S[key]=x256(a[i+2]);i+=2}else if(a[i+1]==2){S[key]=`rgb(${a[i+2]},${a[i+3]},${a[i+4]})`;i+=4}}}
+  const S=TM.s;let fg=S.fg,bg=S.bg,k="";if(S.r)[fg,bg]=[bg||"#0e0f11",fg||"#d4d7dc"];if(fg)k+="color:"+fg+";";if(bg)k+="background:"+bg+";";if(S.b)k+="font-weight:700;";if(S.d)k+="opacity:.6;";if(S.u)k+="text-decoration:underline;";TM.sk=k}
+ else if(f=="K"){const n=a[0];if(n==0)TM.cells.length=Math.min(TM.cells.length,TM.col);else if(n==2)TM.cells=[];else if(n==1)for(let i=0;i<TM.col;i++)TM.cells[i]=null}
+ else if(f=="J"){if(a[0]==2||a[0]==3)tmClear()}else if(f=="C")TM.col+=a[0]||1;else if(f=="D")TM.col=Math.max(0,TM.col-(a[0]||1));else if(f=="G")TM.col=Math.max(0,(a[0]||1)-1)}
+function tmFeed(s){s=TM.carry+s;TM.carry="";let i=0;
+ while(i<s.length){const c=s[i];
+  if(c=="\x1b"){const r=s.slice(i,i+60),m=/^\x1b\[([0-9;?]*)([ -\/]*)([@-~])/.exec(r);if(m){tmCsi(m[1],m[3]);i+=m[0].length;continue}
+   const o=/^\x1b\][^\x07\x1b]*(\x07|\x1b\\)/.exec(s.slice(i,i+400));if(o){i+=o[0].length;continue}
+   if(/^\x1b(\[[0-9;?]*[ -\/]*|\][^\x07\x1b]*)?$/.test(s.slice(i))){TM.carry=s.slice(i);break}
+   i+=/^\x1b[()#]/.test(r)?3:2;continue}
+  if(c=="\n")tmNl();else if(c=="\r")TM.col=0;else if(c=="\b")TM.col=Math.max(0,TM.col-1);else if(c=="\t"){const n=8-TM.col%8;for(let k=0;k<n;k++)tmPut(" ")}else if(c>=" "&&c!="\x7f")tmPut(c);i++}
+ TM.cur.innerHTML=tmLine(TM.cells)}
+function tmClear(){TM.out.querySelectorAll(".tl:not(#tcur)").forEach(e=>e.remove());TM.nrows=0;TM.cells=[];TM.col=0;TM.cur.innerHTML=""}
+async function tmLoop(){for(;;){const o=await post("/term/read",{pos:TM.pos});if(o.ok===false){await sleep(1500);continue}
+ TM.pty=o.pty;TM.busy=o.busy;TM.pos=o.pos;
+ if(o.data){const b=atob(o.data),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);const bot=TM.sc.scrollHeight-TM.sc.scrollTop-TM.sc.clientHeight<50;tmFeed(TM.dec.decode(u,{stream:true}));if(bot)TM.sc.scrollTop=TM.sc.scrollHeight}
+ if(!TM.ai){const e=$("#tms");e.textContent=o.busy?"running…":"";e.className=o.busy?"busy":""}}}
+async function tmSend(t){if(!TM.pty&&t.length>1)tmFeed(t.replace(/\n/g,"\r\n"));await post("/term/write",{data:t})}
+function tmAI(c){TM.ai=!!c;const e=$("#tms");e.textContent=c?"Jarvis is running: "+c.slice(0,70):"";e.className=c?"ai":"";if(c&&!TM.auto&&!document.body.classList.contains("tm")){TM.auto=1;openTerm()}}
+function tmFit(){if(!$("#term").offsetParent)return;const m=document.createElement("span");m.style.cssText='position:absolute;visibility:hidden;white-space:pre;font:13px/1.45 ui-monospace,"JetBrains Mono",Menlo,Consolas,monospace';m.textContent="x".repeat(40);TM.sc.append(m);const cw=m.getBoundingClientRect().width/40;m.remove();
+ const cols=Math.max(40,Math.floor((TM.sc.clientWidth-34)/cw)),rows=Math.max(8,Math.floor(TM.sc.clientHeight/19));if(cols!=TM.cols){TM.cols=cols;post("/term/resize",{cols,rows})}}
+function openTerm(){document.body.classList.add("tm");setTimeout(()=>{tmFit();$("#tmin").focus();TM.sc.scrollTop=TM.sc.scrollHeight},80)}
+async function tmRestart(){await post("/term/restart");TM.pos=0;TM.carry="";TM.dec=new TextDecoder();tmClear()}
+const THIST=JSON.parse(localStorage.jvt||"[]");let ti=THIST.length;
+$("#tmin").onkeydown=e=>{const el=e.target;
+ if(e.key=="Enter"){const t=el.value;el.value="";if(t.trim()){THIST.push(t);ti=THIST.length;localStorage.jvt=JSON.stringify(THIST.slice(-60))}tmSend(t+"\n")}
+ else if(e.ctrlKey&&e.key=="c"&&!getSelection().toString()){e.preventDefault();tmSend("\x03")}else if(e.ctrlKey&&e.key=="d"){e.preventDefault();tmSend("\x04")}else if(e.ctrlKey&&e.key=="l"){e.preventDefault();tmClear();tmSend("\n")}
+ else if(e.key=="ArrowUp"&&ti>0){e.preventDefault();el.value=THIST[--ti]}else if(e.key=="ArrowDown"&&ti<THIST.length){e.preventDefault();ti++;el.value=THIST[ti]||""}else if(e.key=="Tab")e.preventDefault()};
+[["ls -la","ls -la"],["pwd","pwd"],["git status","git status"],["python version","python3 --version"],["clear","clear"]].forEach(([l,c])=>{const b=document.createElement("button");b.textContent=l;b.onclick=()=>{tmSend(c+"\n");$("#tmin").focus()};$("#tmq").append(b)});
+$("#bTerm").onclick=()=>document.body.classList.contains("tm")?document.body.classList.remove("tm"):openTerm();
+$("#tmX").onclick=()=>document.body.classList.remove("tm");$("#tmC").onclick=()=>tmSend("\x03");$("#tmCl").onclick=tmClear;$("#tmR").onclick=tmRestart;
+$("#tmCp").onclick=()=>copyText([...TM.out.children].map(e=>e.textContent).join("\n").replace(/\u200b/g,""));
+$("#tmb").onclick=()=>{if(!getSelection().toString())$("#tmin").focus()};addEventListener("resize",tmFit);
+$("#tmh").onmousedown=e=>{if(e.target.closest("button"))return;const y0=e.clientY,h0=$("#term").offsetHeight,mv=ev=>document.body.style.setProperty("--th",Math.max(120,Math.min(innerHeight*.8,h0+y0-ev.clientY))+"px"),up=()=>{removeEventListener("mousemove",mv);removeEventListener("mouseup",up);tmFit()};addEventListener("mousemove",mv);addEventListener("mouseup",up)};
+tmLoop();
+/* ---------- command palette (Ctrl+K) ---------- */
+const exportChat=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([LOG.map(x=>(x.c=="u"?"You: ":"Jarvis: ")+x.t).join("\n\n")],{type:"text/plain"}));a.download="jarvis-chat.txt";a.click()};
+const PAL=()=>[["plus","New chat",newChat],["term","Toggle terminal",()=>$("#bTerm").click()],["code","Toggle code editor",()=>$("#bEd").click()],["phone","Start live call",liveOn],["sunny","Switch light / dark theme",()=>$("#bTheme").click()],["sliders","Open settings",openSettings],["zap","Toggle auto-approve",()=>$("#bAuto").click()],["vol","Toggle voice",()=>$("#bVoice").click()],["max","Toggle full screen",()=>$("#bFs").click()],["dl","Export chat",exportChat],["trash","Clear terminal",tmClear],["replay","Restart terminal",tmRestart],["search","Focus the chat box",()=>$("#in").focus()],...Object.keys(PERSONA).map(k=>["spark","Personality: "+k,()=>{S.persona=k;save();toast("Personality: "+k)}])];
+let psel=0,pitems=[];
+function pRender(){const q=$("#pin").value.toLowerCase().trim();pitems=PAL().filter(x=>!q||x[1].toLowerCase().includes(q));psel=Math.min(psel,Math.max(0,pitems.length-1));$("#plist").innerHTML="";
+ pitems.forEach((x,i)=>{const d=document.createElement("div");d.className="pi"+(i==psel?" sel":"");d.innerHTML=I(x[0]);d.append(x[1]);d.onclick=()=>{closePal();x[2]()};$("#plist").append(d)})}
+function openPal(){$("#pal").classList.add("on");$("#pin").value="";psel=0;pRender();$("#pin").focus()}const closePal=()=>$("#pal").classList.remove("on");
+$("#pin").oninput=()=>{psel=0;pRender()};
+$("#pin").onkeydown=e=>{if(e.key=="ArrowDown"){e.preventDefault();psel=Math.min(psel+1,pitems.length-1);pRender()}else if(e.key=="ArrowUp"){e.preventDefault();psel=Math.max(psel-1,0);pRender()}else if(e.key=="Enter"&&pitems[psel]){const f=pitems[psel][2];closePal();f()}else if(e.key=="Escape")closePal()};
+$("#pal").onclick=e=>{if(e.target==$("#pal"))closePal()};
+$("#chat").addEventListener("scroll",()=>{const c=$("#chat");$("#sdn").classList.toggle("on",c.scrollHeight-c.scrollTop-c.clientHeight>160)});$("#sdn").onclick=()=>$("#chat").scrollTo({top:1e9,behavior:"smooth"});
+let HIST=JSON.parse(localStorage.jvi||"[]"),hi=HIST.length;
+$("#in").addEventListener("keydown",e=>{if(e.key=="ArrowUp"&&hi>0){e.preventDefault();$("#in").value=HIST[--hi]}else if(e.key=="ArrowDown"&&hi<HIST.length){e.preventDefault();hi++;$("#in").value=HIST[hi]||""}});
+$("#bStop").onclick=()=>{interrupt();turnBusy=0;idle()};$("#bTheme").onclick=()=>{S.theme=S.theme=="light"?"dark":"light";save()};
+setInterval(()=>document.body.classList.toggle("busy",!!(turnBusy||speaking)),250);
+addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key=="k"){e.preventDefault();openPal()}});
+$("#chat").addEventListener("click",e=>{const b=e.target.closest(".cbc");if(b)copyText(b.closest(".cbk").querySelector("code").textContent)});loadKatex();
+LOG.forEach(x=>add(x.c,x.t,1));
+let greeted=0;const hr=new Date().getHours(),g=hr<12?"Good morning":hr<18?"Good afternoon":"Good evening",ok=S.k||S.p=="ollama",
+gt=ok?(LOG.length?`${g}. Welcome back.`:`${g}. Jarvis online. I can chat, run commands, write code, search the web, or you can start a live call.`):`${g}. I'm Jarvis. To get started, add an API key in Settings. Each setting explains why it's needed.`;
+$("#gt").textContent=ok?"How can I help today? Chat, build apps, run commands, search the web, or start a live call.":gt;if(!ok){const b=document.createElement("button");b.className="pri";b.innerHTML=I("sliders")+" Open settings";b.onclick=openSettings;$("#gt").after(b)}
+[["code","Build a to-do web app and host it"],["search","Search the latest AI news"],["sun","What's the weather in Tokyo?"],["img","Generate a picture of a calm blue robot"],["slides","Make a 6-slide Google Slides deck about space"],["table","Make a Google Sheet budget with a chart"],["form","Create a Google Form for event feedback"],["calendar","Add a meeting tomorrow at 3pm to my calendar"],["term","Show me what's in my apps folder"]].forEach(([ic,t])=>{const x=document.createElement("button");x.className="chip";x.innerHTML=I(ic)+t;x.onclick=()=>turn(t);$("#chips").append(x)});syncEmpty();
+const greet=()=>{if(greeted||live)return;greeted=1;speak(gt)};
+addEventListener("pointerdown",greet,{once:true});addEventListener("keydown",greet,{once:true});speechSynthesis.getVoices();
+</script></body></html>
